@@ -7,6 +7,8 @@
 php_errorlog
 .log
 
+/migrations
+
 # do not ignore gitpod and render files
 !.gitpod.Dockerfile
 !.welcome
