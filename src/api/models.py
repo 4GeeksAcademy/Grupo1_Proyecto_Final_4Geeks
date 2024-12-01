@@ -49,3 +49,25 @@ class User(db.Model):
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
+
+class Vehicle(db.Model):
+    __tablename__ = 'vehicles'
+    vehicle_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    vehicle_type = db.Column(db.String(50), nullable=False)
+    plate_number = db.Column(db.String(20), unique=True, nullable=False)
+    brand = db.Column(db.String(50), nullable=True)
+    model = db.Column(db.String(50), nullable=True)
+    instructor_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)  
+
+    instructor = db.relationship('User', backref=db.backref('vehicles', lazy=True))
+
+
+    def serialize(self):
+        return {
+            "vehicle_id": self.vehicle_id,
+            "vehicle_type": self.vehicle_type,
+            "plate_number": self.plate_number,
+            "brand": self.brand,
+            "model": self.model,
+            "instructor_id": self.instructor_id
+        }

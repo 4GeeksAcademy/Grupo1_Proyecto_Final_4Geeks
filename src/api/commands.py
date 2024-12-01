@@ -1,6 +1,6 @@
 
 import click
-from api.models import db, User
+from api.models import db, User, Vehicle
 from api.data_models import DATA_INSTRUCTORS, DATA_VEHICLES
 
 """
@@ -56,15 +56,13 @@ def setup_commands(app):
         print("Creating Vehicles")
 
         for vehicles_data in DATA_VEHICLES:
-            vehicle = User(
-                user_id=vehicles_data["user_id"],
-                email=vehicles_data["email"],
-                role=vehicles_data["role"],
-                first_name=vehicles_data["first_name"],
-                last_name=vehicles_data["last_name"],
-                phone_number=vehicles_data["phone_number"],
+            vehicle = Vehicle(
+                vehicle_type=vehicles_data["vehicle_type"],
+                plate_number=vehicles_data["plate_number"],
+                model=vehicles_data["model"],
+                instructor_id=vehicles_data["instructor_id"],
             )
-            instructor.set_password(instructor_data["password"])
-            db.session.add(instructor)
+            db.session.add(vehicle)
         db.session.commit()
-        print("All instructors created")
+        print("All vehicles created")
+
