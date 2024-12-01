@@ -1,6 +1,7 @@
 
 import click
 from api.models import db, User
+from api.data_models import DATA_INSTRUCTORS, DATA_VEHICLES
 
 """
 In this file, you can add as many commands as you want using the @app.cli.command decorator
@@ -29,6 +30,41 @@ def setup_commands(app):
 
         print("All test users created")
 
-    @app.cli.command("insert-test-data")
-    def insert_test_data():
-        pass
+##
+
+    @app.cli.command("insert-instructors")
+    def insert_instructors():
+        print("Creating instructors")
+
+        for instructor_data in DATA_INSTRUCTORS:
+            instructor = User(
+                user_id=instructor_data["user_id"],
+                email=instructor_data["email"],
+                role=instructor_data["role"],
+                first_name=instructor_data["first_name"],
+                last_name=instructor_data["last_name"],
+                phone_number=instructor_data["phone_number"],
+            )
+            instructor.set_password(instructor_data["password"])
+            db.session.add(instructor)
+        db.session.commit()
+        print("All instructors created")
+
+
+    @app.cli.command("insert-vehicles")
+    def insert_instructors():
+        print("Creating Vehicles")
+
+        for vehicles_data in DATA_VEHICLES:
+            vehicle = User(
+                user_id=vehicles_data["user_id"],
+                email=vehicles_data["email"],
+                role=vehicles_data["role"],
+                first_name=vehicles_data["first_name"],
+                last_name=vehicles_data["last_name"],
+                phone_number=vehicles_data["phone_number"],
+            )
+            instructor.set_password(instructor_data["password"])
+            db.session.add(instructor)
+        db.session.commit()
+        print("All instructors created")
