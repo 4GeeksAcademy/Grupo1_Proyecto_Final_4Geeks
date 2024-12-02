@@ -1,4 +1,4 @@
-DATA_INSTRUCTORS = [
+DATA_INSTRUCTORS: list[dict[str, str]] = [
   {
     "user_id": "feca5687-5052-48aa-bf2a-ccee6d57f1a1",
     "email": "andres.martinez@example.com",
@@ -182,7 +182,7 @@ DATA_INSTRUCTORS = [
 ]
 
 
-DATA_VEHICLES = [
+DATA_VEHICLES: list[dict[str, str]] = [
   {
     "vehicle_type": "Moto",
     "plate_number": "ABC1234",
@@ -330,3 +330,4 @@ DATA_VEHICLES = [
     "instructor_id": "feca5687-5052-48aa-bf2a-ccee6d57f1b9"
   }
 ]
+

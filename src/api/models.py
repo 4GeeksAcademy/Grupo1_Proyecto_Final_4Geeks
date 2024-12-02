@@ -8,7 +8,6 @@ import uuid
 import re
 
 
-
 db = SQLAlchemy()
 
 
@@ -119,7 +118,7 @@ class Schedule(db.Model):
         if not (valid_start_time <= time_end <= valid_end_time):
             return False
 
-        # Valida que la diferencia entre time_start y time_end es una hora
+        # Valida que la diferencia entre time_start y time_end sea una hora
         if time_end != (datetime.combine(datetime.today(), time_start) + timedelta(hours=1)).time():
             return False
 
