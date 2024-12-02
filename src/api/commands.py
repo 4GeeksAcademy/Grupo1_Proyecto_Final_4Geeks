@@ -1,6 +1,7 @@
 
 import click
-from api.models import db, User, Vehicle
+import datetime
+from api.models import db, User, Vehicle, Schedule
 from api.data_models import DATA_INSTRUCTORS, DATA_VEHICLES
 
 """
@@ -66,3 +67,50 @@ def setup_commands(app):
         db.session.commit()
         print("All vehicles created")
 
+
+
+    @app.cli.command("insert-schedules")
+    def insert_schedules():
+        print("Generando las Agendas...")
+
+        # Definir los parámetros
+        start_date = datetime.date.today()
+        end_date = start_date + datetime.timedelta(days=60) 
+
+
+        instructors = User.query.filter_by(role="instructor").all()
+
+        schedules = []
+
+        for instructor in instructors:
+            current_date = start_date
+            while current_date <= end_date:
+
+                if current_date.weekday() < 5:
+                    # Generar horarios de 10:00 a 18:00 en intervalos de 1 hora
+                    start_time = datetime.time(10, 0)  # 10:00
+                    end_time = datetime.time(18, 0)   # 18:00
+
+                    current_time = start_time
+                    while current_time < end_time:
+                        next_time = (datetime.datetime.combine(datetime.date(1, 1, 1), current_time) + 
+                                    datetime.timedelta(hours=1)).time()
+
+                        schedule = Schedule(
+                            instructor_id=instructor.user_id,
+                            date=current_date,
+                            time_start=current_time,
+                            time_end=next_time,
+                            is_available=True,
+                        )
+                        schedules.append(schedule)
+
+                        current_time = next_time
+
+
+                current_date += datetime.timedelta(days=1)
+
+
+        db.session.bulk_save_objects(schedules)
+        db.session.commit()
+        print(f"Generated {len(schedules)} schedule entries for instructors.")
