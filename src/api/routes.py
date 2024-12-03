@@ -45,3 +45,12 @@ def get_all_instructors():
         return jsonify(instructors_serialized), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@api.route('/instructors/<string:instructor_id>', methods=['GET'])
+def get_instructor_by_id(instructor_id):
+    try:
+        instructor = User.query.filter_by(user_id=instructor_id, role='instructor').first()
+        if not instructor:
+            return jsonify({"error": "Instructor not found"}), 404
+        return jsonify(instructor.serialize()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
