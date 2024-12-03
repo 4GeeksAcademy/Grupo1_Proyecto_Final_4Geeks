@@ -123,3 +123,56 @@ class Schedule(db.Model):
             return False
 
         return True
+
+"""
+class Lesson(db.Model):
+    __tablename__ = 'lessons'
+
+    lesson_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    student_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
+    instructor_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
+    schedule_id = db.Column(db.String(36), db.ForeignKey('schedules.schedule_id'), nullable=False)
+    status = db.Column(db.String(15), default='pending', nullable=False)  # Ejemplo: 'completed', 'canceled'
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+
+    # Relaciones
+    student = db.relationship('User', foreign_keys=[student_id], backref=db.backref('lessons', lazy=True))
+    instructor = db.relationship('User', foreign_keys=[instructor_id])
+    schedule = db.relationship('Schedule', backref=db.backref('lessons', lazy=True))
+
+    def serialize(self):
+
+        return {
+            "lesson_id": self.lesson_id,
+            "student_id": self.student_id,
+            "instructor_id": self.instructor_id,
+            "schedule_id": self.schedule_id,
+            "status": self.status,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+    @staticmethod
+    def validate_status(status):
+        '''Método estático para validar el estado de la lección.'''
+        valid_statuses = ['pending', 'completed', 'canceled']
+        return status in valid_statuses
+
+    @staticmethod
+    def validate_schedule_instructor(schedule_id, instructor_id):
+        '''Método estático para validar que la clase esté asignada al instructor correcto.'''
+        schedule = Schedule.query.get(schedule_id)
+        if schedule and schedule.instructor_id != instructor_id:
+            return False
+        return True
+
+    @staticmethod
+    def validate_vehicle_assigned(instructor_id):
+        '''Método para verificar que el instructor tenga un vehículo asignado.'''
+        instructor = User.query.get(instructor_id)
+        if instructor and hasattr(instructor, 'vehicles') and len(instructor.vehicles) > 0:
+            return True
+        return False
+
+"""
