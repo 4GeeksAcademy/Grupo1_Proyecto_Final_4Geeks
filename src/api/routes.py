@@ -28,3 +28,13 @@ def get_all_users():
         return jsonify(users_serialized), 200
     except Exception as e:
         return jsonify({"MSG":"error al obtener usuarios", "error":str(e)}), 500
+@api.route('/users/<string:user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado "}), 404
+        return jsonify(user.serialize()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
