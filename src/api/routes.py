@@ -37,4 +37,11 @@ def get_user_by_id(user_id):
         return jsonify(user.serialize()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+@api.route('/instructors', methods=['GET'])
+def get_all_instructors():
+    try:
+        instructors = User.query.filter_by(role='instructor').all()
+        instructors_serialized = [instructor.serialize() for instructor in instructors]
+        return jsonify(instructors_serialized), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
