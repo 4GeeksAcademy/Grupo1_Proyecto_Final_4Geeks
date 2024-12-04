@@ -58,6 +58,7 @@ def setup_commands(app):
 
         for vehicles_data in DATA_VEHICLES:
             vehicle = Vehicle(
+                brand=vehicles_data["brand"],
                 vehicle_type=vehicles_data["vehicle_type"],
                 plate_number=vehicles_data["plate_number"],
                 model=vehicles_data["model"],
@@ -87,9 +88,9 @@ def setup_commands(app):
             while current_date <= end_date:
 
                 if current_date.weekday() < 5:
-                    # Generar horarios de 10:00 a 18:00 en intervalos de 1 hora
-                    start_time = datetime.time(10, 0)  # 10:00
-                    end_time = datetime.time(18, 0)   # 18:00
+
+                    start_time = datetime.time(10, 0)  
+                    end_time = datetime.time(18, 0)   
 
                     current_time = start_time
                     while current_time < end_time:
