@@ -124,7 +124,7 @@ class Schedule(db.Model):
 
         return True
 
-"""
+
 class Lesson(db.Model):
     __tablename__ = 'lessons'
 
@@ -132,9 +132,9 @@ class Lesson(db.Model):
     student_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
     instructor_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
     schedule_id = db.Column(db.String(36), db.ForeignKey('schedules.schedule_id'), nullable=False)
-    status = db.Column(db.String(15), default='pending', nullable=False)  # Ejemplo: 'completed', 'canceled'
-    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    status = db.Column(db.String(15), default='Pendiente', nullable=False) 
+    created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
+    updated_at = db.Column(db.DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
     # Relaciones
     student = db.relationship('User', foreign_keys=[student_id], backref=db.backref('lessons', lazy=True))
@@ -156,7 +156,7 @@ class Lesson(db.Model):
     @staticmethod
     def validate_status(status):
         '''Método estático para validar el estado de la lección.'''
-        valid_statuses = ['pending', 'completed', 'canceled']
+        valid_statuses: list[str] = ['Pendiente', 'Aprobada', 'Cancelada', 'Reprobada']
         return status in valid_statuses
 
     @staticmethod
@@ -166,13 +166,4 @@ class Lesson(db.Model):
         if schedule and schedule.instructor_id != instructor_id:
             return False
         return True
-
-    @staticmethod
-    def validate_vehicle_assigned(instructor_id):
-        '''Método para verificar que el instructor tenga un vehículo asignado.'''
-        instructor = User.query.get(instructor_id)
-        if instructor and hasattr(instructor, 'vehicles') and len(instructor.vehicles) > 0:
-            return True
-        return False
-
-"""
+    
