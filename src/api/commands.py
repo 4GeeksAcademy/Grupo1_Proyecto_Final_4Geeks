@@ -44,6 +44,7 @@ def setup_commands(app):
                 role=instructor_data["role"],
                 first_name=instructor_data["first_name"],
                 last_name=instructor_data["last_name"],
+                birthdate=instructor_data["birthdate"],
                 phone_number=instructor_data["phone_number"],
             )
             instructor.set_password(instructor_data["password"])
@@ -63,6 +64,7 @@ def setup_commands(app):
                 plate_number=vehicles_data["plate_number"],
                 model=vehicles_data["model"],
                 instructor_id=vehicles_data["instructor_id"],
+                lesson_price=vehicles_data["lesson_price"],
             )
             db.session.add(vehicle)
         db.session.commit()
