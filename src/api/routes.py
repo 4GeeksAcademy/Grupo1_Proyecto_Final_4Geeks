@@ -55,3 +55,15 @@ def get_instructor_by_id(instructor_id):
         return jsonify(instructor.serialize()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+## Agendas Disponibles
+
+@api.route('/schedules/available', methods=['GET'])
+def get_available_schedules():
+    try:
+        available_schedules = Schedule.query.filter_by(is_available=True).all()
+        serialized_schedules = [schedule.serialize() for schedule in available_schedules]
+        return jsonify(serialized_schedules), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -76,7 +76,6 @@ def setup_commands(app):
     def insert_schedules():
         print("Generando las Agendas...")
 
-        # Definir los parámetros
         start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=60) 
 
