@@ -91,8 +91,8 @@ class Vehicle(db.Model):
 
 class Schedule(db.Model):
     __tablename__ = 'schedules'
-    schedule_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    instructor_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
+    schedule_id = db.Column(db.String(40), primary_key=True, default=lambda: str(uuid.uuid4()))
+    instructor_id = db.Column(db.String(40), db.ForeignKey('users.user_id'), nullable=False)
     date = db.Column(db.Date, nullable=False)  
     time_start = db.Column(db.Time, nullable=False)
     time_end = db.Column(db.Time, nullable=False)
@@ -110,7 +110,7 @@ class Schedule(db.Model):
             "date": self.date.strftime("%Y-%m-%d"),
             "time_start": self.time_start.strftime("%H:%M"),
             "time_end": self.time_end.strftime("%H:%M"),
-            "is_reserved": self.is_reserved,
+            "is_available": self.is_available,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
