@@ -21,7 +21,7 @@ const Register = () => {
   return (
     <div className="container">
       <div>RideUp</div>
-      <div className="col-lg-4 border p-4 m-2">
+      <div className="col-lg-4 border rounded p-4 m-2">
         <div>
           <h3>Registro</h3>
           <p>
