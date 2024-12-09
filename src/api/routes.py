@@ -10,6 +10,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_tok
 
 api = Blueprint('api', __name__)
 
+api.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 # Allow CORS requests to this API
 CORS(api)
 
