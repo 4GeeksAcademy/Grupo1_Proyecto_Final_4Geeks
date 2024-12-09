@@ -5,7 +5,8 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, Vehicle, Schedule, Lesson
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
+from datetime import timedelta
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies
 
 api = Blueprint('api', __name__)
 
@@ -19,6 +20,67 @@ def handle_hello():
     }
     return jsonify(response_body), 200
 
+### Login Endpoints
+
+@api.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not email or not password:
+            return jsonify({"message": "Faltan credenciales"}), 400
+
+        user = User.query.filter_by(email=email).first()
+        if not user or not user.check_password(password):
+            return jsonify({"message": "Credenciales incorrectas"}), 401
+        
+        if not user.is_active:
+            return jsonify({"message": "El usuario está inactivo"}), 403
+
+
+        access_token = create_access_token(identity=user.user_id)
+        
+        response = jsonify({
+            "message": "Inicio de sesión exitoso",
+            "access_token": access_token,
+            "user": user.serialize()
+        })
+
+        set_access_cookies(response, access_token)
+
+        return response, 200
+    
+    except Exception as e:
+        print(f"Error en el login: {str(e)}")
+        return jsonify({"message": "Error interno del servidor"}), 500
+
+
+@api.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    
+    if user:
+        return jsonify({
+            "message": "Acceso permitido",
+            "user": user.serialize()
+        }), 200
+    else:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+
+
+@api.route('/logout', methods=['POST'])
+def logout():
+    response = jsonify({"message": "Sesión cerrada exitosamente"})
+    unset_jwt_cookies(response)  
+    return response, 200
+
+
+###
+
 
 @api.route('/users', methods=['GET'])
 def get_all_users():
@@ -28,42 +90,6 @@ def get_all_users():
         return jsonify(users_serialized), 200
     except Exception as e:
         return jsonify({"MSG": "Error al obtener usuarios", "error": str(e)}), 500
-
-
-@api.route('/users', methods=['GET'])
-@jwt_required()
-def get_user_by_token():
-    try:
-        user_email = get_jwt_identity()
-        if not user_email:
-            return jsonify({"error": "No se pudo autenticar al usuario"}), 401
-
-        user = User.query.filter_by(email=user_email).first()
-        if not user:
-            return jsonify({"error": "Usuario no encontrado"}), 404
-
-        return jsonify(user.serialize()), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@api.route('/token', methods=['POST'])
-def create_token():
-    try:
-        data = request.get_json()
-        if not data or "email" not in data:
-            return jsonify({"error": "El email es obligatorio"}), 400
-
-        user = User.query.filter_by(email=data["email"]).first()
-
-        if not user:
-            return jsonify({"error": "Usuario no encontrado"}), 404
-
-        token = create_access_token(identity=user.email)
-
-        return jsonify({"token": token}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 @api.route('/instructors', methods=['GET'])
