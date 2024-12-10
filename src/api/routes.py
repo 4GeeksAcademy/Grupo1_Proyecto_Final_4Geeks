@@ -68,7 +68,6 @@ def protected():
     if user:
         return jsonify({
             "message": "Acceso permitido",
-            "user": user.serialize()
         }), 200
     else:
         return jsonify({"message": "Usuario no encontrado"}), 404
@@ -81,6 +80,49 @@ def logout():
     return response, 200
 
 ### 
+
+### Crear Usuarios
+
+@api.route("/create_user", methods=["POST"])
+def create_students():
+    data = request.get_json()
+
+
+    if not data or not all(key in data for key in ('email', 'password', 'first_name', 'last_name', 'phone_number')):
+        return jsonify({"message": "Faltan datos requeridos."}), 400
+
+
+    if not User.validate_email(data['email']):
+        return jsonify({"message": "El email no es válido."}), 400
+
+    """if not User.validate_phone_number(data['phone_number']):
+        return jsonify({"message": "El número de teléfono no es válido."}), 400"""
+
+    try:
+        user_id = data.get('user_id', None)
+        user = User(
+            user_id=user_id,
+            email=data['email'],
+            password=data['password'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            phone_number=data['phone_number'],
+            birthdate=data['birthdate'],
+        )
+        user.set_password(data['password'])
+
+        db.session.add(user)
+        db.session.commit()
+
+        return jsonify({"message": f"Usuario {data['email']} creado exitosamente."}), 201
+
+    except Exception as e:
+        db.session.rollback()  
+        return jsonify({"message": "Hubo un error al crear el usuario.", "error": str(e)}), 500
+
+
+    
+###
 
 
 @api.route('/users', methods=['GET'])

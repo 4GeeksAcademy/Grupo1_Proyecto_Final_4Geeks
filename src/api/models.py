@@ -14,10 +14,10 @@ db = SQLAlchemy()
 class User(db.Model):
     __tablename__ = 'users'
     
-    user_id = db.Column(db.String(40), primary_key=True, default=str(uuid.uuid4()))
+    user_id = db.Column(db.String(40), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(20), nullable=False)
+    role = db.Column(db.String(20),default='student', nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=True)
     phone_number = db.Column(db.String(15), unique=True, nullable=False)
@@ -62,6 +62,13 @@ class User(db.Model):
         age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
         return age >= 16
 
+
+    @staticmethod
+    def validate_email(email):
+        """Valida el correo electrónico"""
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$'
+        pattern = re.compile(email_regex)
+        return pattern.match(email) is not None
 
 
 class Vehicle(db.Model):
