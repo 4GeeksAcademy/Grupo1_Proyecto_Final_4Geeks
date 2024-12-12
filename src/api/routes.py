@@ -177,3 +177,29 @@ def get_available_schedules():
         return jsonify(serialized_schedules), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@api.route('/instructors/vehicle/<string:vehicle_id>', methods=['GET'])
+def get_instructors_by_vehicle(vehicle_id):
+    try:
+        instructors = User.query.join(Vehicle).filter(Vehicle.vehicle_id == vehicle_id, User.role == 'instructor').all()
+        if not instructors:
+            return jsonify([]), 200
+        instructors_serialized = [instructor.serialize() for instructor in instructors]
+        return jsonify(instructors_serialized), 200
+    except Exception as e:
+        return jsonify({"message": "Error al obtener instructores", "error": str(e)}), 500
+@api.route('/schedules/instructor/<string:instructor_id>/date/<string:date>', methods=['GET'])
+def get_available_schedules_by_instructor_and_date(instructor_id, date):
+    try:
+        date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({"message": "Formato de fecha incorrecto (YYYY-MM-DD)"}), 400
+    try:
+        schedules = Schedule.query.filter_by(instructor_id=instructor_id, date=date_obj, is_available=True).all()
+        if not schedules:
+            return jsonify([]), 200
+        serialized_schedules = [schedule.serialize() for schedule in schedules]
+        return jsonify(serialized_schedules), 200
+    except Exception as e:
+        return jsonify({"message": "Error al obtener horarios", "error": str(e)}), 500
