@@ -1,0 +1,10 @@
+.form-control{
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+span{
+    color: tomato;
+    font-size: x-small;
+}
