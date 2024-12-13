@@ -54,6 +54,7 @@ def login():
         print(f"Error en el login: {str(e)}")
         return jsonify({"message": "Error interno del servidor"}), 500
 
+
 @api.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
@@ -66,6 +67,7 @@ def protected():
         }), 200
     else:
         return jsonify({"message": "Usuario no encontrado"}), 404
+        
 
 @api.route('/logout', methods=['POST'])
 def logout():
@@ -73,8 +75,8 @@ def logout():
     unset_jwt_cookies(response)
     return response, 200
 
-### Crear Usuarios
 
+### Crear Usuarios
 @api.route("/create_user", methods=["POST"])
 def create_students():
     data = request.get_json()
@@ -107,8 +109,8 @@ def create_students():
         db.session.rollback()
         return jsonify({"message": "Hubo un error al crear el usuario.", "error": str(e)}), 500
 
-### Obtener Usuarios
 
+### Obtener Usuarios
 @api.route('/users', methods=['GET'])
 def get_all_users():
     try:
@@ -117,6 +119,18 @@ def get_all_users():
         return jsonify(users_serialized), 200
     except Exception as e:
         return jsonify({"MSG": "Error al obtener usuarios", "error": str(e)}), 500
+
+
+@api.route('/users/<string:user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado "}), 404
+        return jsonify(user.serialize()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @api.route('/instructors', methods=['GET'])
 def get_all_instructors():
@@ -127,15 +141,17 @@ def get_all_instructors():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @api.route('/instructors/<string:instructor_id>', methods=['GET'])
 def get_instructor_by_id(instructor_id):
     try:
         instructor = User.query.filter_by(user_id=instructor_id, role='instructor').first()
         if not instructor:
-            return jsonify({"error": "Instructor no encontrado"}), 404
+            return jsonify({"error": "Instructor not found"}), 404
         return jsonify(instructor.serialize()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @api.route('/instructors/<string:instructor_id>/lessons/pending', methods=['GET'])
 def get_pending_lessons_by_instructor(instructor_id):
@@ -150,6 +166,8 @@ def get_pending_lessons_by_instructor(instructor_id):
     except Exception as e:
         return jsonify({"error": "Ha ocurrido un error al obtener las lecciones pendientes", "details": str(e)}), 500
 
+
+## Agendas Disponibles
 @api.route('/schedules/available', methods=['GET'])
 def get_available_schedules():
     try:
@@ -158,6 +176,7 @@ def get_available_schedules():
         return jsonify(serialized_schedules), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @api.route('/instructors/vehicle/<string:vehicle_id>', methods=['GET'])
 def get_instructors_by_vehicle(vehicle_id):
@@ -169,6 +188,7 @@ def get_instructors_by_vehicle(vehicle_id):
         return jsonify(instructors_serialized), 200
     except Exception as e:
         return jsonify({"message": "Error al obtener instructores", "error": str(e)}), 500
+
 
 @api.route('/schedules/instructor/<string:instructor_id>/date/<string:date>', methods=['GET'])
 def get_available_schedules_by_instructor_and_date(instructor_id, date):
@@ -184,3 +204,6 @@ def get_available_schedules_by_instructor_and_date(instructor_id, date):
         return jsonify(serialized_schedules), 200
     except Exception as e:
         return jsonify({"message": "Error al obtener horarios", "error": str(e)}), 500
+    
+
+

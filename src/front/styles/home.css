@@ -1,7 +1,123 @@
-/*
-    home.css: This website contains selectors only used in home.css
+.jakarta {
+    /* <weight>: Use a value from 200 to 800 */
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
 
-    All pages share the styles on index.css but you should create 
-    one more css for each page that will contain the selected used 
-    on that page only (the ones not reused in other pages).
-*/
+.inter {
+    /* <weight>: Use a value from 100 to 900*/
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.empresa {
+    margin: 0 auto;
+}
+
+.empresaImg {
+    width: 4rem;
+    margin-left: 1rem;
+}
+
+.empresa .card {
+    border-color: #000842;
+}
+
+.card {
+    border-radius: 16px;
+    margin: 5px;
+    padding: 0px;
+}
+
+.card-title {
+    color: #153E81;
+    font-weight: 700;
+}
+
+.cat {
+    color: #ffffff;
+    font-weight: 400;
+}
+
+.divImage {
+    width: 10px;
+}
+
+.jumbotron {
+    background-color: #153E81;
+    background-size: contain;
+    color: #FFFFFF;
+    padding: 5%;
+    width: 100%;
+    height: 370px;
+}
+
+.wave {
+    width: 100%;
+}
+
+.ruta {
+    background-image: url("https://i.imgur.com/ziIpp27.png");
+    background-position: center center;
+    background-size: cover;
+    background-color: #153E81;
+    padding: 4rem;
+    color: #FFFFFF;
+    height: 450px;
+    width: 100%;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    border-radius: 15px;
+    position: relative;
+}
+
+.pasos {
+    background-color: #E0EBFE;
+    padding: 1rem;
+    border-radius: 16px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.pasosTitle {
+    color: #0062B6;
+    font-weight: 600;
+}
+
+.number {
+    font-weight: 100;
+    width: 3rem;
+    height: 3rem;
+}
+
+.categorias {
+    background-color: #153E81;
+    color: #FFFFFF;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.categorias .card {
+    background-color: #153E81;
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+}
+
+.categorias .card a {
+    text-align: right;
+}
+
+.card-img-top {
+    width: 100%;
+    margin: 0px;
+}
+
+.btn-ligh {
+    color: #0062B6;
+    font-weight: 700;
+}
+
+.btn a {
+    color: #FFFFFF;
+}
