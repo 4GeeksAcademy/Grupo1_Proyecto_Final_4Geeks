@@ -121,3 +121,95 @@
 .btn a {
     color: #FFFFFF;
 }
+
+
+
+/*Navbar*/
+
+.navbar {
+    background-color: rgb(251, 251, 251);
+  
+    border: 12px solid #153E81;
+    border-right: none;
+    border-left: none;
+  
+  
+  }
+  
+  .navbar-toggler:hover {
+  
+    color: inherit;
+    box-shadow: inherit;
+    background-color: inherit;
+  
+  }
+  
+  .navbar-brand {
+    color: #153E81;
+  }
+  
+  .navbar-toggler {
+    color: #153E81;
+  }
+  
+  .offcanvas-header {
+    color: #153E81;
+  }
+  
+  .nav-link {
+    color: #153E81;
+  }
+  
+  
+  
+  /*Footer*/
+  
+    
+    .footer {
+      padding: 0px;
+      background-color: #e0ebfe;
+      width: 100%;
+      bottom: 0px;
+      
+      
+     
+      
+      }
+      .footer-izq, .footer-centro, .footer-der {
+      flex: 1;
+      min-width: 250px;
+      margin: 50px;
+      text-align: center;
+      }
+      .social-icons i {
+      
+      cursor: pointer;
+      font-size: small;
+      line-height: 0;
+      }
+      
+      
+  
+      .titulo{
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        font-size: 1.5rem;
+        margin-bottom: 5%;
+      }
+      .parrafo{
+        font-size: x-small;
+        line-height: 0;
+      }
+  
+      .location, .sobre, .phone {
+        font-size: x-small;
+      }
+  
+      .texto{
+        font-size: x-small;
+        line-height: 0;
+              
+      }
+  
+    .boton{
+      align-self: flex-end;
+    }
