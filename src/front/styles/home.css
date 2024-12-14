@@ -169,15 +169,16 @@
   
     
     .footer {
+
+      margin-right: 12px;
+      margin-left: 0px;
       padding: 0px;
       background-color: #e0ebfe;
       width: 100%;
       bottom: 0px;
       
-      
-     
-      
       }
+
       .footer-izq, .footer-centro, .footer-der {
       flex: 1;
       min-width: 250px;
@@ -216,3 +217,5 @@
     .boton{
       align-self: flex-end;
     }
+
+   
