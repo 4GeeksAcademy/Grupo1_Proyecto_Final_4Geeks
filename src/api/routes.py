@@ -156,9 +156,6 @@ def get_all_instructors_info():
                 "last_name": instructor.last_name,
                 "phone_number": instructor.phone_number,
                 "vehicle_type": instructor.vehicles[0].vehicle_type,   
-                "plate_number": instructor.vehicles[0].plate_number,
-                "brand": instructor.vehicles[0].brand,
-                "model": instructor.vehicles[0].model,
                 "lesson_price": instructor.vehicles[0].lesson_price,
                 "schedules":available_schedules
                 
