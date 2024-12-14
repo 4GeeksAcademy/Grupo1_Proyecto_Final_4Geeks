@@ -14,7 +14,7 @@ db = SQLAlchemy()
 class User(db.Model):
     """Users"""
     __tablename__ = 'users'
-    user_id = db.Column(db.String(40), primary_key=True, default=str(uuid.uuid4()))
+    user_id = db.Column(db.String(40), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), default='student', nullable=False)
