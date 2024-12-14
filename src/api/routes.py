@@ -10,7 +10,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_tok
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
-CORS(api)
+CORS(api, resources={r"/api/*": {"origins": "*"}})
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
@@ -123,29 +123,32 @@ def get_all_users():
 
 
 
-@api.route('/instructors', methods=['GET'])
-def get_all_instructors():
+@api.route('/lessons/available', methods=['GET'])
+def get_instructors_by_vehicle():
     try:
-        instructors = User.query.filter_by(role='instructor').all()
-        instructors_serialized = [instructor.serialize() for instructor in instructors]
-        return jsonify(instructors_serialized), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+
+        vehicle_type = request.args.get('vehicle_type', None)
 
 
-@api.route('/instructors/info', methods=['GET'])
-def get_all_instructors_info():
- 
-    try:
-        instructors = (
-            User.query
-            .filter(User.role == 'instructor', User.is_active == True)
-            .all()
-        )
+        if vehicle_type:
+            instructors = (
+                User.query
+                .filter(
+                    User.role == 'instructor',
+                    User.is_active == True,
+                    User.vehicles.any(vehicle_type=vehicle_type)  
+                )
+                .all()
+            )
+        else:
+            instructors = (
+                User.query
+                .filter(User.role == 'instructor', User.is_active == True)
+                .all()
+            )
 
         instructors_serialized = []
         for instructor in instructors:
-
             available_schedules = [
                 schedule.serialize() for schedule in instructor.schedules if schedule.is_available
             ]
@@ -157,8 +160,7 @@ def get_all_instructors_info():
                 "phone_number": instructor.phone_number,
                 "vehicle_type": instructor.vehicles[0].vehicle_type,   
                 "lesson_price": instructor.vehicles[0].lesson_price,
-                "schedules":available_schedules
-                
+                "schedules": available_schedules
             }
             instructors_serialized.append(instructor_data)
 
@@ -166,6 +168,47 @@ def get_all_instructors_info():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@api.route('/api/lessons', methods=['POST'])
+def create_lesson():
+    try:
+
+        data = request.json
+
+
+        student_id = data.get('student_id')
+        instructor_id = data.get('instructor_id')
+        schedule_id = data.get('schedule_id')
+        status = data.get('status')
+
+        if not student_id or not instructor_id or not schedule_id or not status:
+            return jsonify({"error": "Datos incompletos"}), 400
+
+
+        if not Lesson.validate_status(status):
+            return jsonify({"error": "Estado de lección no válido"}), 400
+
+
+        if not Lesson.validate_schedule_instructor(schedule_id, instructor_id):
+            return jsonify({"error": "El instructor no está asignado a este horario"}), 400
+
+
+        new_lesson = Lesson(
+            student_id='feca5687-5052-48aa-bf2a-ccee6d57f1a1',
+            instructor_id=instructor_id,
+            schedule_id=schedule_id,
+            status=status
+        )
+
+        db.session.add(new_lesson)
+        db.session.commit()
+
+
+        return jsonify(new_lesson.serialize()), 201
+
+    except Exception as e:
+        print("Error al crear la lección:", e)
+        return jsonify({"error": "Error interno del servidor"}), 500
 
 
 ## Agendas Disponibles
