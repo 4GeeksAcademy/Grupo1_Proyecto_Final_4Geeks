@@ -169,12 +169,10 @@ def get_instructors_by_vehicle():
         return jsonify({"error": str(e)}), 500
 
 
-@api.route('/api/lessons', methods=['POST'])
+@api.route('/api/reservations', methods=['POST'])
 def create_lesson():
     try:
-
         data = request.json
-
 
         student_id = data.get('student_id')
         instructor_id = data.get('instructor_id')
@@ -185,16 +183,24 @@ def create_lesson():
             return jsonify({"error": "Datos incompletos"}), 400
 
 
+        student = User.query.get(student_id)
+        instructor = User.query.get(instructor_id)
+        schedule = Schedule.query.get(schedule_id)
+
+        if not student or not instructor or not schedule:
+            return jsonify({"error": "IDs no válidos"}), 400
+
+        # Validar estado de la lección
         if not Lesson.validate_status(status):
             return jsonify({"error": "Estado de lección no válido"}), 400
 
-
+        # Validar que el instructor esté asignado al horario
         if not Lesson.validate_schedule_instructor(schedule_id, instructor_id):
             return jsonify({"error": "El instructor no está asignado a este horario"}), 400
 
 
         new_lesson = Lesson(
-            student_id='feca5687-5052-48aa-bf2a-ccee6d57f1a1',
+            student_id=student_id,
             instructor_id=instructor_id,
             schedule_id=schedule_id,
             status=status
@@ -202,7 +208,6 @@ def create_lesson():
 
         db.session.add(new_lesson)
         db.session.commit()
-
 
         return jsonify(new_lesson.serialize()), 201
 
