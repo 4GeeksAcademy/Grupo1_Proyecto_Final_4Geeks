@@ -16,7 +16,7 @@ class User(db.Model):
     user_id = db.Column(db.String(40), primary_key=True, default=str(uuid.uuid4()))
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(20), nullable=False)
+    role = db.Column(db.String(20), default='student', nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=True)
     phone_number = db.Column(db.String(15), unique=True, nullable=False)
@@ -60,6 +60,13 @@ class User(db.Model):
         today = date.today()
         age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
         return age >= 16
+
+
+    @staticmethod
+    def validate_email(email):
+        """Método estático para validar el mail"""
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        return re.match(email_regex, email) is not None
 
 
 class Student(db.Model):
@@ -264,4 +271,4 @@ class Lesson(db.Model):
         if schedule and schedule.instructor_id != instructor_id:
             return False
         return True
-## adcadb7b4941_ -- Ultima migracion funcional
+
