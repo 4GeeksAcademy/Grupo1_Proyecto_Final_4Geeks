@@ -1,0 +1,41 @@
+@media only screen and (max-width: 600px) {
+    
+    .userContainer{
+        width: 100%;
+        border-top: 0px;
+    }
+}
+
+@media only screen and (min-width: 601px) {
+    
+    .userContainer{
+        width: 600px;
+    }
+}
+
+.userContainer{
+    background-color: #E0EBFE;
+    margin: 0 auto;
+}
+
+.input-group-text {
+    background-color: white;
+    border-top: none;
+}
+.round {
+    border-radius: 50%;
+    overflow: hidden;
+    width: 200px;
+    height: 200px;
+    background: no-repeat 50%;
+    object-fit: cover;
+  }
+  .round img {
+     display: block;
+     height: 100%;
+     width: 100%;
+  }
+
+  .rectangle{
+    width: 100%;
+}
