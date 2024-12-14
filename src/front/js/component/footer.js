@@ -2,9 +2,9 @@ import React, { Component } from "react";
 
 export const Footer = () => (
 	<div className=" container-fluid">
-		<footer className="footer d-flex flex-wrap justify-content-between">
+		<footer className="footer row py-4">
 
-			<div className="footer-izq mb-3 text-center text-md-start">
+			<div className="col-12 col-md-4 text-center text-md-start mb-3">
 
 				<div className="titulo">
 					RoadUp Academia de manejo
@@ -29,7 +29,7 @@ export const Footer = () => (
 
 			</div>
 
-			<div className="footer-centro mb-3 text-center">
+			<div className="col-12 col-md-4 text-center mb-3">
 				<div className="titulo">
 					Pregúntanos
 				</div>
@@ -46,7 +46,7 @@ export const Footer = () => (
 				
 			</div>
 
-			<div className="footer-der mb-3 text-center text-md-end">
+			<div className="col-12 col-md-4 text-center text-md-end mb-3">
 				<div className="titulo">
 					Compañía
 				</div>
