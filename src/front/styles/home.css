@@ -127,6 +127,9 @@
 /*Navbar*/
 
 .navbar {
+    
+    margin-right: 12px;
+    margin-left: 12px;
     background-color: rgb(251, 251, 251);
   
     border: 12px solid #153E81;
@@ -184,7 +187,7 @@
       .social-icons i {
       
       cursor: pointer;
-      font-size: small;
+      font-size:medium;
       line-height: 0;
       }
       
@@ -196,16 +199,16 @@
         margin-bottom: 5%;
       }
       .parrafo{
-        font-size: x-small;
+        font-size: small;
         line-height: 0;
       }
   
       .location, .sobre, .phone {
-        font-size: x-small;
+        font-size: small;
       }
   
       .texto{
-        font-size: x-small;
+        font-size: small;
         line-height: 0;
               
       }
