@@ -35,8 +35,14 @@ def setup_commands(app):
 
     @app.cli.command("insert-instructors")
     def insert_instructors():
-        print("Creating instructors")
+        print("Verificando si los instructores ya existen...")
+        
 
+        if User.query.filter_by(role="instructor").count() == 20:
+            print("Los instructores ya existen en la base de datos. Saltando inserción.")
+            return
+
+        print("Creando instructores...")
         for instructor_data in DATA_INSTRUCTORS:
             instructor = User(
                 user_id=instructor_data["user_id"],
@@ -50,54 +56,59 @@ def setup_commands(app):
             instructor.set_password(instructor_data["password"])
             db.session.add(instructor)
         db.session.commit()
-        print("All instructors created")
+        print("Instructores creados con éxito.")
 
 
     @app.cli.command("insert-vehicles")
-    def insert_instructors():
-        print("Creating Vehicles")
+    def insert_vehicles():
+        print("Verificando si los vehículos ya existen...")
+    
 
-        for vehicles_data in DATA_VEHICLES:
+        if Vehicle.query.count() == 20:
+            print("Los vehículos ya existen en la base de datos. Saltando inserción.")
+            return
+
+        print("Creando vehículos...")
+        for vehicle_data in DATA_VEHICLES:
             vehicle = Vehicle(
-                brand=vehicles_data["brand"],
-                vehicle_type=vehicles_data["vehicle_type"],
-                plate_number=vehicles_data["plate_number"],
-                model=vehicles_data["model"],
-                instructor_id=vehicles_data["instructor_id"],
-                lesson_price=vehicles_data["lesson_price"],
+                brand=vehicle_data["brand"],
+                vehicle_type=vehicle_data["vehicle_type"],
+                plate_number=vehicle_data["plate_number"],
+                model=vehicle_data["model"],
+                instructor_id=vehicle_data["instructor_id"],
+                lesson_price=vehicle_data["lesson_price"],
             )
             db.session.add(vehicle)
         db.session.commit()
-        print("All vehicles created")
+        print("Vehículos creados con éxito.")
 
 
 
     @app.cli.command("insert-schedules")
     def insert_schedules():
-        print("Generando las Agendas...")
+        print("Verificando si las agendas ya existen...")
 
+
+        if Schedule.query.count() > 0:
+            print("Las agendas ya existen en la base de datos. Saltando generación.")
+            return
+
+        print("Generando las agendas...")
         start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=60) 
-
-
         instructors = User.query.filter_by(role="instructor").all()
-
         schedules = []
 
         for instructor in instructors:
             current_date = start_date
             while current_date <= end_date:
-
-                if current_date.weekday() < 5:
-
-                    start_time = datetime.time(10, 0)  
-                    end_time = datetime.time(18, 0)   
-
+                if current_date.weekday() < 5:  # Lunes a Viernes
+                    start_time = datetime.time(10, 0)
+                    end_time = datetime.time(18, 0)
                     current_time = start_time
                     while current_time < end_time:
                         next_time = (datetime.datetime.combine(datetime.date(1, 1, 1), current_time) + 
                                     datetime.timedelta(hours=1)).time()
-
                         schedule = Schedule(
                             instructor_id=instructor.user_id,
                             date=current_date,
@@ -106,13 +117,10 @@ def setup_commands(app):
                             is_available=True,
                         )
                         schedules.append(schedule)
-
                         current_time = next_time
-
-
                 current_date += datetime.timedelta(days=1)
-
 
         db.session.bulk_save_objects(schedules)
         db.session.commit()
-        print(f"Generated {len(schedules)} schedule entries for instructors.")
+        print(f"Generadas {len(schedules)} entradas de agenda para instructores.")
+
