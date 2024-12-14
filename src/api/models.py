@@ -11,13 +11,14 @@ import re
 db = SQLAlchemy()
 
 
+
 class User(db.Model):
-    """Users"""
     __tablename__ = 'users'
+    
     user_id = db.Column(db.String(40), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(20), default='student', nullable=False)
+    role = db.Column(db.String(20), nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=True)
     phone_number = db.Column(db.String(15), unique=True, nullable=False)
@@ -61,71 +62,12 @@ class User(db.Model):
         today = date.today()
         age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
         return age >= 16
-
-
+    
     @staticmethod
     def validate_email(email):
         """Método estático para validar el mail"""
         email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
         return re.match(email_regex, email) is not None
-
-
-class Student(db.Model):
-    __tablename__ = 'students'
-    student_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    first_name = db.Column(db.String(20), unique=False, nullable=False)
-    last_name = db.Column(db.String(20), unique=False, nullable=True)
-    birthday = db.Column(db.Date, unique=False, nullable=False)
-    phone_number = db.Column(db.String(15), unique=True, nullable=False)  
-    email = db.Column(db.String(120), unique=True, nullable=False)
-
-    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('students', lazy=True))
-
-
-    def __repr__(self):
-        return f'<Student {self.first_name} {self.last_name}>'
-
-
-    def serialize(self):
-        return {
-            "student_id": self.student_id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "birthday": self.birthday.strftime("%Y-%m-%d"),
-            "phone_number": self.phone_number,
-            "email": self.email,
-            "user_id": self.user_id
-        }
-
-
-class Instructor(db.Model):
-    __tablename__ = 'instructors'
-    instructor_id = db.Column(db.String(36), primary_key=True)
-    first_name = db.Column(db.String(20), unique=False, nullable=False)
-    last_name = db.Column(db.String(20), unique=False, nullable=True)
-    phone_number = db.Column(db.String(15), unique=True, nullable=False) 
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    instructor_type = db.Column(db.String(20), unique=False, nullable=False)
-
-    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('instructor', lazy=True))
-
-
-    def __repr__(self):
-        return f'<Instructor {self.first_name} {self.last_name}>'
-
-
-    def serialize(self):
-        return {
-            "instructor_id": self.instructor_id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "phone_number": self.phone_number,
-            "email": self.email,
-            "user_id": self.user_id,
-            "instructor_type": self.instructor_type
-        }
 
 
 class Vehicle(db.Model):
@@ -150,30 +92,6 @@ class Vehicle(db.Model):
             "model": self.model,
             "instructor_id": self.instructor_id,
             "lesson_price": self.lesson_price
-        }
-
-class LoginSessions(db.Model):
-    __tablename__ = 'login_sessions'
-    login_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
-    token = db.Column(db.String(500), nullable=False)
-    is_valid = db.Column(db.Boolean(), unique=False, nullable=False, default=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-
-    user = db.relationship('User', backref=db.backref('login_sessions', lazy=True))
-
-
-    def __repr__(self):
-        return f'<LoginSession login_id={self.login_id}, user_id={self.user_id}, is_valid={self.is_valid}>'
-
-
-    def serialize(self):
-        return {
-            "login_id": self.login_id,
-            "user_id": self.user_id,
-            "token": self.token,
-            "is_valid": self.is_valid,
-            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
 
 
@@ -272,4 +190,3 @@ class Lesson(db.Model):
         if schedule and schedule.instructor_id != instructor_id:
             return False
         return True
-

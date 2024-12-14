@@ -121,15 +121,6 @@ def get_all_users():
         return jsonify({"MSG": "Error al obtener usuarios", "error": str(e)}), 500
 
 
-@api.route('/users/<string:user_id>', methods=['GET'])
-def get_user_by_id(user_id):
-    try:
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({"error": "Usuario no encontrado "}), 404
-        return jsonify(user.serialize()), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 @api.route('/instructors', methods=['GET'])
@@ -138,6 +129,74 @@ def get_all_instructors():
         instructors = User.query.filter_by(role='instructor').all()
         instructors_serialized = [instructor.serialize() for instructor in instructors]
         return jsonify(instructors_serialized), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route('/instructors/info', methods=['GET'])
+def get_all_instructors_info():
+ 
+    try:
+        instructors = (
+            User.query
+            .filter(User.role == 'instructor', User.is_active == True)
+            .all()
+        )
+
+        instructors_serialized = []
+        for instructor in instructors:
+
+            available_schedules = [
+                schedule.serialize() for schedule in instructor.schedules if schedule.is_available
+            ]
+
+            instructor_data = {
+                "instructor_id": instructor.user_id,
+                "first_name": instructor.first_name,
+                "last_name": instructor.last_name,
+                "phone_number": instructor.phone_number,
+                "vehicle_type": instructor.vehicles[0].vehicle_type,   
+                "plate_number": instructor.vehicles[0].plate_number,
+                "brand": instructor.vehicles[0].brand,
+                "model": instructor.vehicles[0].model,
+                "lesson_price": instructor.vehicles[0].lesson_price,
+                "schedules":available_schedules
+                
+            }
+            instructors_serialized.append(instructor_data)
+
+        return jsonify(instructors_serialized), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+## Agendas Disponibles
+@api.route('/schedules/available', methods=['GET'])
+def get_available_schedules():
+    try:
+        available_schedules = Schedule.query.filter_by(is_available=True).all()
+        serialized_schedules = [schedule.serialize() for schedule in available_schedules]
+        return jsonify(serialized_schedules), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+
+
+
+
+
+"""
+
+@api.route('/users/<string:user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado "}), 404
+        return jsonify(user.serialize()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -166,16 +225,6 @@ def get_pending_lessons_by_instructor(instructor_id):
     except Exception as e:
         return jsonify({"error": "Ha ocurrido un error al obtener las lecciones pendientes", "details": str(e)}), 500
 
-
-## Agendas Disponibles
-@api.route('/schedules/available', methods=['GET'])
-def get_available_schedules():
-    try:
-        available_schedules = Schedule.query.filter_by(is_available=True).all()
-        serialized_schedules = [schedule.serialize() for schedule in available_schedules]
-        return jsonify(serialized_schedules), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 @api.route('/instructors/vehicle/<string:vehicle_id>', methods=['GET'])
@@ -207,3 +256,4 @@ def get_available_schedules_by_instructor_and_date(instructor_id, date):
     
 
 
+"""
