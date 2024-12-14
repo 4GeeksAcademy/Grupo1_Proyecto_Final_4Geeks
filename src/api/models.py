@@ -12,6 +12,7 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
+    """Users"""
     __tablename__ = 'users'
     user_id = db.Column(db.String(40), primary_key=True, default=str(uuid.uuid4()))
     email = db.Column(db.String(120), unique=True, nullable=False)
