@@ -8,7 +8,7 @@ export const Navbar = () => {
 			<div className=" container-fluid ">
 
 				<div className=" container-fluid d-flex justify-content-between my-0 py-0">
-					<h1 className="navbar-brand ml-4 ">RoadUp</h1>
+					<h1 className="navbar-brand ml-4 "><NavLink to="/" className="navbar-brand">RoadUp</NavLink></h1>
 
 					<div className="d-flex justify-content-between mr-4">
 						{
