@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Dinámico</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Reserva de Clase</h2>
+    <form id="reservation-form">
+        <!-- Selección del Vehículo -->
+        <div class="mb-3">
+            <label for="vehicle-type" class="form-label">Selecciona el tipo de vehículo:</label>
+            <select id="vehicle-type" class="form-select" required>
+                <option value="">Seleccione un vehículo</option>
+                <option value="Auto">Auto</option>
+                <option value="Moto">Moto</option>
+                <option value="Camion">Camión</option>
+            </select>
+        </div>
+
+        <!-- Selección del Instructor -->
+        <div class="mb-3">
+            <label for="instructor" class="form-label">Selecciona un instructor:</label>
+            <select id="instructor" class="form-select" required>
+                <option value="">Seleccione un instructor</option>
+            </select>
+        </div>
+
+        <!-- Selección del Día -->
+        <div class="mb-3">
+            <label for="schedule-date" class="form-label">Selecciona un día:</label>
+            <select id="schedule-date" class="form-select" required>
+                <option value="">Seleccione un día</option>
+            </select>
+        </div>
+
+        <!-- Selección de Horario -->
+        <div class="mb-3">
+            <label for="schedule" class="form-label">Selecciona un horario:</label>
+            <select id="schedule" class="form-select" required>
+                <option value="">Seleccione un horario</option>
+            </select>
+        </div>
+
+        <!-- Checkbox de pago -->
+       <div class="form-check mb-3">
+            <input type="checkbox" id="is-paid" class="form-check-input">
+            <label for="is-paid" class="form-check-label">Pagado</label>
+            <p id="lesson-price-info" class="ml-2 text-muted"></p>
+        </div>
+
+        <!-- Botón de Enviar -->
+        <button type="submit" class="btn btn-primary">Reservar</button>
+    </form>
+</div>
+
+<script>
+    const vehicleTypeSelect = document.getElementById('vehicle-type');
+    const instructorSelect = document.getElementById('instructor');
+    const scheduleDateSelect = document.getElementById('schedule-date');
+    const scheduleSelect = document.getElementById('schedule');
+    const isPaidCheckbox = document.getElementById('is-paid');
+    const lessonPriceElement = document.getElementById('lesson-price-info'); // Elemento para mostrar el precio de la lección
+
+    let allInstructors = []; // Variable global para almacenar todos los instructores
+
+    // Escuchar cambios en el tipo de vehículo y hacer fetch
+    vehicleTypeSelect.addEventListener('change', async () => {
+        const selectedVehicleType = vehicleTypeSelect.value;
+
+        if (!selectedVehicleType) {
+            // Si no se ha seleccionado ningún vehículo, limpiar los selects
+            instructorSelect.innerHTML = '<option value="">Seleccione un instructor</option>';
+            scheduleDateSelect.innerHTML = '<option value="">Seleccione un día</option>';
+            scheduleSelect.innerHTML = '<option value="">Seleccione un horario</option>';
+            lessonPriceElement.textContent = '';
+            return;
+        }
+
+        try {
+            // Hacer fetch al endpoint con el parámetro `vehicle_type`
+            const response = await fetch(`https://humble-halibut-7x5w5jqr6xxfr6r4-3001.app.github.dev/api/lessons/available?vehicle_type=${selectedVehicleType}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Data fetched for instructors:', data); 
+
+            // Poblar instructores
+            populateInstructorOptions(data);
+
+            // Obtener el precio de la lección del primer elemento del array de datos
+            if (data.length > 0) {
+                updateLessonPriceInfo(data[0].lesson_price);
+            }
+        } catch (error) {
+            console.error('Error al obtener los datos:', error.message);
+            // Aquí puedes mostrar un mensaje de error en la interfaz de usuario, si es necesario
+        }
+    });
+
+    // Poblar las opciones de instructores
+    function populateInstructorOptions(instructors) {
+        instructorSelect.innerHTML = '<option value="">Seleccione un instructor</option>';
+        scheduleDateSelect.innerHTML = '<option value="">Seleccione un día</option>';
+        scheduleSelect.innerHTML = '<option value="">Seleccione un horario</option>';
+
+        instructors.forEach(instructor => {
+            const option = document.createElement('option');
+            option.value = instructor.instructor_id;
+            option.textContent = `${instructor.first_name} ${instructor.last_name}`;
+            instructorSelect.appendChild(option);
+        });
+
+        // Guardar los instructores en la variable global para usar después
+        allInstructors = instructors;
+        console.log('All instructors:', allInstructors); 
+    }
+
+    // Escuchar cambios en el instructor
+    instructorSelect.addEventListener('change', () => {
+        const selectedInstructorId = instructorSelect.value;
+
+        console.log('Selected Instructor ID:', selectedInstructorId); // Verificación del ID seleccionado
+
+        // Encontrar el instructor seleccionado y actualizar las fechas del horario
+        fetchScheduleDatesForInstructor(selectedInstructorId);
+    });
+
+
+    function updateLessonPriceInfo(lessonPrice) {
+        lessonPriceElement.textContent = `Costo de la lección: ${lessonPrice}`;
+        console.log('Updated lesson price info:', lessonPrice);
+    }
+
+    // Poblar las opciones de días
+    function populateScheduleDateOptions(dates) {
+        scheduleDateSelect.innerHTML = '<option value="">Seleccione un día</option>';
+
+        dates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            scheduleDateSelect.appendChild(option);
+        });
+
+        console.log('Available dates:', dates); 
+    }
+
+    // Filtrar horarios según el día seleccionado
+    function fetchSchedulesForDate(selectedDate) {
+        const selectedInstructor = allInstructors.find(
+            instructor => instructor.instructor_id == instructorSelect.value
+        );
+
+        if (selectedInstructor && selectedInstructor.schedules) {
+            const schedules = selectedInstructor.schedules.filter(
+                schedule => schedule.date === selectedDate
+            );
+
+            if (schedules.length > 0) {
+                populateScheduleOptions(selectedInstructor.instructor_id, schedules);
+            } else {
+                scheduleSelect.innerHTML = '<option value="">Seleccione un horario</option>'; 
+            }
+        }
+
+        console.log('Fetched schedules for date:', selectedDate); 
+    }
+
+    // Poblar las opciones de horarios
+    function populateScheduleOptions(instructorId, schedules) {
+        scheduleSelect.innerHTML = ''; // Limpia las opciones actuales
+
+        schedules.forEach(schedule => {
+            const option = document.createElement('option');
+            option.value = schedule.schedule_id;
+            option.textContent = `${schedule.time_start} - ${schedule.time_end}`; // Muestra horario como "HH:MM - HH:MM"
+            scheduleSelect.appendChild(option);
+        });
+
+    }
+
+    // Filtrar horarios del instructor seleccionado
+    function fetchScheduleDatesForInstructor(instructorId) {
+        const selectedInstructor = allInstructors.find(
+            instructor => instructor.instructor_id == instructorId
+        );
+
+        if (selectedInstructor && selectedInstructor.schedules) {
+            populateScheduleDateOptions(selectedInstructor.schedules.map(schedule => schedule.date));
+        }
+
+        console.log('Instructor schedules for selected ID:', instructorId); // Verificación de instructores y horarios
+    }
+
+    // Escuchar cambios en el día seleccionado
+    scheduleDateSelect.addEventListener('change', () => {
+        const selectedDate = scheduleDateSelect.value;
+
+        // Validar que la fecha seleccionada sea mayor a la fecha de hoy
+        const today = new Date();
+        const selectedDateObj = new Date(selectedDate);
+
+        if (selectedDateObj <= today) {
+            alert("La fecha seleccionada debe ser mayor a la fecha de hoy."); // Muestra un mensaje de error
+            scheduleDateSelect.value = ''; // Limpiar la selección
+            scheduleSelect.innerHTML = '<option value="">Seleccione un horario</option>';
+            return;
+        }
+
+        console.log('Selected Date:', selectedDate); // Verificación de la fecha seleccionada
+
+        // Obtener horarios para el día seleccionado
+        fetchSchedulesForDate(selectedDate);
+    });
+
+    // Manejar el envío del formulario
+    document.getElementById('reservation-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const studentId = 'feca5687-5052-48aa-bf2a-ccee6d57f1a3'; // Obtén el ID del usuario desde tu sistema
+        const instructorId = instructorSelect.value;
+        const scheduleId = scheduleSelect.value;
+        const status = 'Pendiente'; // Estado por defecto
+        const isPaid = isPaidCheckbox.checked; // Obtener el valor del checkbox
+
+        // Validar que todos los campos estén seleccionados
+        if (!instructorId || !scheduleId || !status) {
+            alert('Por favor, selecciona todos los campos.');
+            return;
+        }
+
+        const reservationData = {
+            student_id: studentId,
+            instructor_id: instructorId,
+            schedule_id: scheduleId,
+            status: status,
+            is_paid: isPaid
+        };
+
+        try {
+            // Realiza el envío a la API con los datos de la reserva
+            const response = await fetch('https://humble-halibut-7x5w5jqr6xxfr6r4-3001.app.github.dev/api/reservations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reservationData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Manejar respuesta exitosa
+            const responseData = await response.json();
+            alert('Reserva realizada exitosamente.'); // Mensaje de éxito
+            console.log('Reserva exitosa:', responseData);
+            // Aquí puedes redirigir o limpiar el formulario si es necesario
+
+            // Limpiar el formulario
+            document.getElementById('reservation-form').reset();
+            scheduleSelect.innerHTML = '<option value="">Seleccione un horario</option>'; // Limpiar el select de horarios
+            scheduleDateSelect.innerHTML = '<option value="">Seleccione un día</option>'; // Limpiar el select de días
+            instructorSelect.innerHTML = '<option value="">Seleccione un instructor</option>'; // Limpiar el select de instructores
+        } catch (error) {
+            console.error('Error al realizar la reserva:', error.message);
+            alert('Hubo un error al realizar la reserva. Por favor, intenta nuevamente.');
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
