@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
+import { Link, NavLink } from "react-router-dom";
 import misionURL from "../../img/mision.png";
 import visionURL from "../../img/vision.png";
 import valoresURL from "../../img/valores.png";
@@ -26,7 +27,9 @@ export const Home = () => {
 					<h2>Tu confianza al volante empieza en RoadUp!</h2>
 				</div>
 				<div className="col-12 col-md-11 d-flex justify-content-end ">
-					<button type="button" className="btn btn-light btn-lg text-primary">Comienza ahora!</button>
+					<button type="button" className="btn btn-light btn-lg text-primary  shadow">
+						<NavLink to="/register" className="text-primary">Comienza ahora!</NavLink>
+					</button>
 				</div>
 			</div>
 			<div className="wave d-none d-sm-block d-md-block">
@@ -100,7 +103,9 @@ export const Home = () => {
 							y coordinar luego las horas de clase.
 						</p>
 
-						<button type="button" className="btn btn-light text-primary">Comienza ahora!</button>
+						<button type="button" className="btn btn-light btn-lg text-primary  shadow">
+							<NavLink to="/register" className="text-primary">Comienza ahora!</NavLink>
+						</button>
 
 					</div>
 				</div>
