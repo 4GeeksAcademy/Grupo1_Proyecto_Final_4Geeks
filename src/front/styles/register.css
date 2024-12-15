@@ -8,3 +8,7 @@ span{
     color: tomato;
     font-size: x-small;
 }
+
+a{
+    text-decoration-line: none;
+}

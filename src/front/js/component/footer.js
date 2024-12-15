@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 export const Footer = () => (
 	<div className=" container-fluid">
-		<footer className="footer row py-4">
+		<footer className="footer row py-4 px-4">
 
 			<div className="col-12 col-md-4 text-center text-md-start mb-3">
 
@@ -39,11 +39,11 @@ export const Footer = () => (
 						<input className="form-control form-control-sm mb-2" type="text" id="telefono" placeholder="Teléfono" />
 						<input className="form-control form-control-sm mb-2" type="email" placeholder="Email" required />
 						<textarea className="form-control form-control-sm mb-2" id="comen" rows="3" placeholder="Comentarios"></textarea>
-						<button className="boton btn btn-primary d-flex justify-content-end" type="submit">Enviar</button>
+						<button className="boton btn btn-primary justify-content-center w-50" type="submit">Enviar</button>
 					</div>
 				</form>
 
-				
+
 			</div>
 
 			<div className="col-12 col-md-4 text-center text-md-end mb-3">
