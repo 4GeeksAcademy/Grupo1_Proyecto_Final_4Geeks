@@ -8,7 +8,7 @@ export const Navbar = () => {
 			<div className=" container-fluid ">
 
 				<div className=" container-fluid d-flex justify-content-between my-0 py-0">
-					<h1 className="navbar-brand ml-4 ">RoadUp</h1>
+					<h1 className="navbar-brand ml-4 "><NavLink to="/" className="navbar-brand ml-4">RoadUp</NavLink></h1>
 
 					<div className="d-flex justify-content-between mr-4">
 						{
@@ -54,7 +54,7 @@ export const Navbar = () => {
 								<a className="nav-link" href="#">Agendar clase</a>
 							</li>
 							<li className="nav-item">
-								<a className="nav-link" href="#">Mi usuario</a>
+								<NavLink to="/user" className="nav-link">Mi usuario</NavLink>
 							</li>
 							<li className="nav-item">
 								<a className="nav-link" href="#">Cerrar sesión</a>
