@@ -12,7 +12,7 @@ export const Navbar = () => {
 
 					<div className="d-flex justify-content-between mr-4">
 						{
-							false &&
+							true &&
 							<ul className="list-group list-group-horizontal">
 								<li className="list-group-item ">
 									<NavLink to="/login">Inicia Sesión</NavLink>
@@ -24,7 +24,7 @@ export const Navbar = () => {
 						}
 
 						{
-							true &&
+							false &&
 							<>
 								<h3 className="navbar-brand text-primary-emphasis d-flex align-items-center ms-auto"> Hola User </h3>
 
