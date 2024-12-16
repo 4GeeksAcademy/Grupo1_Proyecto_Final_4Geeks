@@ -5,7 +5,7 @@ from api.models import db, User, Vehicle, Schedule, Lesson
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from datetime import timedelta, datetime
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies, JWTManager
 
 api = Blueprint('api', __name__)
 
@@ -76,6 +76,43 @@ def logout():
     return response, 200
 
 
+# ### Crear Usuarios
+# @api.route("/create_user", methods=["POST"])
+# def create_students():
+#     data = request.get_json()
+
+#     if not data or not all(key in data for key in ('email', 'password', 'first_name', 'last_name', 'phone_number')):
+#         return jsonify({"message": "Faltan datos requeridos."}), 400
+
+#     if not User.validate_email(data['email']):
+#         return jsonify({"message": "El email no es válido."}), 400
+
+#     try:
+#         user_id = data.get('user_id', None)
+#         user = User(
+#             user_id=user_id,
+#             email=data['email'],
+#             password=data['password'],
+#             first_name=data['first_name'],
+#             last_name=data['last_name'],
+#             phone_number=data['phone_number'],
+#             birthdate=data['birthdate'],
+#         )
+#         user.set_password(data['password'])
+
+#         db.session.add(user)
+#         db.session.commit()
+
+#         return jsonify({"message": f"Usuario {data['email']} creado exitosamente."}), 201
+
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({"message": "Hubo un error al crear el usuario.", "error": str(e)}), 500
+
+
+
+
+# Codigo con el rol por defecto en student 
 ### Crear Usuarios
 @api.route("/create_user", methods=["POST"])
 def create_students():
@@ -87,6 +124,11 @@ def create_students():
     if not User.validate_email(data['email']):
         return jsonify({"message": "El email no es válido."}), 400
 
+    role = data.get('role', 'student')  # Asignar 'student' como valor predeterminado
+    valid_roles = ['student', 'instructor']
+    if role not in valid_roles:
+        return jsonify({"message": f"El campo 'role' debe ser uno de {valid_roles}"}), 400
+
     try:
         user_id = data.get('user_id', None)
         user = User(
@@ -97,17 +139,19 @@ def create_students():
             last_name=data['last_name'],
             phone_number=data['phone_number'],
             birthdate=data['birthdate'],
+            role=role  # Usar el valor de 'role' (por defecto será 'student')
         )
         user.set_password(data['password'])
 
         db.session.add(user)
         db.session.commit()
 
-        return jsonify({"message": f"Usuario {data['email']} creado exitosamente."}), 201
+        return jsonify({"message": f"Usuario {data['email']} creado exitosamente con rol '{role}'."}), 201
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "Hubo un error al crear el usuario.", "error": str(e)}), 500
+
 
 
 ### Obtener Usuarios

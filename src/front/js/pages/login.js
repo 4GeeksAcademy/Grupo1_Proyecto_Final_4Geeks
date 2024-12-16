@@ -1,73 +1,76 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 
+const BACKEND_URL = process.env.BACKEND_URL;
+
 const Login = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Formulario enviado");
-    console.log(data);
+  const onSubmit = async (data) => {
+    console.log("Datos de inicio de sesión enviados:", data);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Error en el inicio de sesión");
+      }
+      console.log("Inicio de sesión exitoso:", result);
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
   };
 
   return (
-    <div className="Container col-lg-4 border rounded p-4 m-2">
-      <div className="p-4 m-2">
-        <h4>Inicia sesión</h4>
-        <p>
-          Si no tienes una cuenta, puedes crearla <a href="#">aquí</a>
-        </p>
+    <div className="container">
+      <div className="col-lg-4 border rounded p-4 m-4">
+        <h3>Iniciar sesión</h3>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* CORREO ELECTRONICO */}
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
-            <i className="fa-regular fa-envelope"></i> Correo electrónico
+              Correo electrónico
             </label>
             <input
-              id="email"
               type="email"
               className="form-control"
+              id="email"
               {...register("email", {
-                required: "El correo electrónico es obligatorio",
-                pattern: {
-                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                  message: "El formato del correo electrónico no es válido",
-                },
+                required: "El correo es obligatorio",
               })}
             />
-            {errors.email && (
-              <div className="text-danger">{errors.email.message}</div>
-            )}
+            {errors.email && <span>{errors.email.message}</span>}
           </div>
 
+          {/* CONTRASEÑA */}
           <div className="mb-3">
             <label htmlFor="password" className="form-label">
-            <i className="fa-solid fa-lock"></i> Contraseña
+              Contraseña
             </label>
             <input
-              id="password"
               type="password"
               className="form-control"
+              id="password"
               {...register("password", {
                 required: "La contraseña es obligatoria",
-                minLength: {
-                  value: 6,
-                  message: "La contraseña debe tener al menos 6 caracteres",
-                },
               })}
             />
-            {errors.password && (
-              <div className="text-danger">{errors.password.message}</div>
-            )}
+            {errors.password && <span>{errors.password.message}</span>}
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary rounded-pill w-100"
-          >
+          <button type="submit" className="btn btn-primary w-100">
             Inicia sesión
           </button>
         </form>

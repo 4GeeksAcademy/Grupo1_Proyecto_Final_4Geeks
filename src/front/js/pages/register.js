@@ -21,7 +21,7 @@ const Register = () => {
 
     console.log("Datos enviados:", dataToSend);
 
-    fetch(`${BACKEND_URL}/api/create_user`, {
+    fetch(`${BACKEND_URL}api/create_user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -146,15 +146,19 @@ const Register = () => {
 
           {/* CONTRASEÑA */}
           <div className="mb-3">
-            <label htmlFor="exampleInputPassword1" className="form-label">
+            <label htmlFor="exampleInputPassword" className="form-label">
               <i className="fa-solid fa-lock"></i> Contraseña
             </label>
             <input
               type="password"
               className="form-control"
-              id="exampleInputPassword1"
+              id="exampleInputPassword"
               {...register("password", {
                 required: "La contraseña es obligatoria",
+                minLength: {
+                  value: 6,
+                  message: "La contraseña debe tener al menos 6 caracteres",
+                }
               })}
             />
             {errors.password && <span>{errors.password.message}</span>}
@@ -203,7 +207,7 @@ const Register = () => {
                   } else {
                     return "Debes ser mayor de 16 años para ingresar :("
                   }
-                },  
+                },
               })}
             />
             {errors.birthdate && (
