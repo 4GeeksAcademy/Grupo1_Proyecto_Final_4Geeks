@@ -71,7 +71,7 @@ const Login = () => {
           </div>
 
           <button type="submit" className="btn btn-primary w-100">
-            Inicia sesión
+            <NavLink to="/clasesAlumno" className="text-primary">Ingresar</NavLink>
           </button>
         </form>
       </div>

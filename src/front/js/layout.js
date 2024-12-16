@@ -11,7 +11,8 @@ import Login from "./pages/login"
 import Register from "./pages/register"
 import { User } from "./pages/user";
 import RegistroDeClase from "./pages/registroDeClase";
-
+import ClasesAlumno from "./pages/clasesAlumno";
+import ClasesInstructor from "./pages/clasesInstructor";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 
@@ -33,6 +34,8 @@ const Layout = () => {
                         <Route element={<Login />} path="/login" />
                         <Route element={<Register />} path="/register" />
                         <Route element={<RegistroDeClase />} path="/registroDeClase" />
+                        <Route element={<ClasesAlumno />} path="/clasesAlumno" />
+                        <Route element={<ClasesInstructor />} path="/clasesInstructor" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<User />} path="/user" />

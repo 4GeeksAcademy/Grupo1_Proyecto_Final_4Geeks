@@ -1,26 +1,28 @@
 import React from 'react'
+import { Link, NavLink } from "react-router-dom";
+
 
 export const RegistroDeClase = () => {
     return (
 
-        <div className="container col-6 border rounded border-info p-2 mt-5">
+        <div className="container col-6 border rounded p-2 my-5">
             <div className="text-center">
                 <h1>Agendar Clase</h1>
             </div>
             <div className="container">
                 <form>
-                    <div class="row mt-5">
-                        <div class="col-md-6">
-                            <label class="form-label">Tipo de Clase:</label>
-                            <select class="form-select mb-3" aria-label="Tipo de Clase">
+                    <div className="row mt-5">
+                        <div className="col-md-6">
+                            <label className="form-label">Tipo de Clase:</label>
+                            <select className="form-select mb-3" aria-label="Tipo de Clase">
                                 <option value="1">Auto</option>
                                 <option value="2">Moto</option>
                                 <option value="3">Camión</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Cantidad de Clases:</label>
-                            <select class="form-select mb-3" aria-label="Cantidad de Clases">
+                        <div className="col-md-6">
+                            <label className="form-label">Cantidad de Clases:</label>
+                            <select className="form-select mb-3" aria-label="Cantidad de Clases">
                                 <option selected>1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -36,18 +38,18 @@ export const RegistroDeClase = () => {
                     </div>
                     <div className="row">
                         <div className="col">
-                        <label class="form-label">Docente:</label>
-                            <select class="form-select mb-3" aria-label="Tipo de Clase">
+                            <label className="form-label">Docente:</label>
+                            <select className="form-select mb-3" aria-label="Tipo de Clase">
                                 <option value="1">Profe</option>
-                                
+
                             </select>
                         </div>
                         <div className="col">
                             <label className="form-label">Precio:</label>
-                    <div className="input-group mb-3">
-                        <span className="input-group-text">$</span>
-                        <span className="input-group-text">1.000,00</span>
-                    </div>
+                            <div className="input-group mb-3">
+                                <span className="input-group-text">$</span>
+                                <span className="input-group-text">1.000,00</span>
+                            </div>
                         </div>
 
                     </div>
@@ -74,7 +76,9 @@ export const RegistroDeClase = () => {
                         <span className="input-group-text">1.000,00</span>
                     </div>
                     <div className="text-center">
-                        <button type="submit" className="btn btn-success textalign-center">Agendar</button>
+                        <button type="submit" className="btn btn-success textalign-center">
+                            <NavLink to="/clasesAlumno" className="text-primary">Agendar</NavLink>
+                        </button>
                     </div>
                 </form>
             </div>
