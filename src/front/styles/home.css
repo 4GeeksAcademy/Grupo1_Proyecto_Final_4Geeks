@@ -135,6 +135,11 @@
   padding-bottom: 0%;
 }
 
+#menu_bars >span {
+  color: black;
+  font-size: medium;
+}
+
 .navbar-toggler:hover {
   color: inherit;
   box-shadow: inherit;
@@ -155,6 +160,10 @@
 
 .nav-link {
   color: #153e81;
+}
+
+.nav-item:hover{
+  background-color: #eef7ff;
 }
 
 /*Footer*/

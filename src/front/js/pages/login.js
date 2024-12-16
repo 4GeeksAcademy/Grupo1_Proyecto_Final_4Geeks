@@ -1,14 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Link, NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-
-
-const BACKEND_URL = process.env.BACKEND_URL;
+import { NavLink, useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext"; // Ajusta la ruta según tu estructura de archivos
 
 const Login = () => {
+  const { actions } = useContext(Context);
   const navigate = useNavigate();
-
   const {
     register,
     handleSubmit,
@@ -18,29 +15,13 @@ const Login = () => {
   const onSubmit = async (data) => {
     console.log("Datos de inicio de sesión enviados:", data);
 
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Error en el inicio de sesión");
-      }
-      
-      if (result.access_token) {
-        localStorage.setItem("access_token", result.access_token);
-      }
-      console.log("Inicio de sesión exitoso:", result);
+    // Usamos la acción login del flux:
+    const success = await actions.login(data.email, data.password);
+    if (success) {
+      console.log("Inicio de sesión exitoso");
       navigate("/clasesAlumno");
-
-    } catch (error) {
-      console.error("Error:", error.message);
+    } else {
+      console.error("Error al iniciar sesión");
     }
   };
 
