@@ -6,6 +6,9 @@ from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from datetime import timedelta, datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies, JWTManager
+import traceback
+
+
 
 api = Blueprint('api', __name__)
 
@@ -150,8 +153,12 @@ def create_students():
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message": "Hubo un error al crear el usuario.", "error": str(e)}), 500
-
+        print("Error al crear el usuario:")
+        print(traceback.format_exc())  # Imprime el error completo en la terminal
+        return jsonify({
+        "message": "Hubo un error al crear el usuario.",
+        "error": str(e)  # Dejar el error también en la respuesta
+    }), 500
 
 
 ### Obtener Usuarios

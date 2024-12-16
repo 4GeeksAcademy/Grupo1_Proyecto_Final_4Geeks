@@ -1,9 +1,14 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { Link, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -27,7 +32,13 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(result.message || "Error en el inicio de sesión");
       }
+      
+      if (result.access_token) {
+        localStorage.setItem("access_token", result.access_token);
+      }
       console.log("Inicio de sesión exitoso:", result);
+      navigate("/clasesAlumno");
+
     } catch (error) {
       console.error("Error:", error.message);
     }
@@ -37,6 +48,9 @@ const Login = () => {
     <div className="container">
       <div className="col-lg-4 border rounded p-4 m-4">
         <h3>Iniciar sesión</h3>
+        <p>
+          Si no tienes una cuenta, puedes registrarte <NavLink to="/register">aquí!</NavLink>
+        </p>
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* CORREO ELECTRONICO */}
           <div className="mb-3">
@@ -71,7 +85,7 @@ const Login = () => {
           </div>
 
           <button type="submit" className="btn btn-primary w-100">
-            <NavLink to="/clasesAlumno" className="text-primary">Ingresar</NavLink>
+            Ingresar
           </button>
         </form>
       </div>

@@ -148,7 +148,7 @@ export const RegistroDeClase = () => {
                             className="btn btn-success textalign-center"
                             disabled={!isValid}
                         >
-                            <NavLink to="/clasesAlumno" className="text-primary">
+                            <NavLink to="/clasesAlumno" >
                                 Agendar
                             </NavLink>
                         </button>

@@ -15,6 +15,7 @@ from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from dotenv import load_dotenv
+from flask_cors import CORS  
 
 # Cargar las variables del archivo .env
 load_dotenv()
@@ -22,6 +23,8 @@ load_dotenv()
 # Configuración inicial de Flask
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+# Configuración CORS: Permite solicitudes desde tu frontend
+CORS(app, resources={r"/api/*": {"origins": "https://reimagined-barnacle-rxq4wrwx7pj2pg-3000.app.github.dev"}})
 
 # Configuración del entorno
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
