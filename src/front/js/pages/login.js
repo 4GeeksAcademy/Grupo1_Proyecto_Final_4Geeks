@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Context } from "../store/appContext"; // Ajusta la ruta según tu estructura de archivos
+import { Context } from "../store/appContext"; 
 
 const Login = () => {
   const { actions } = useContext(Context);
@@ -15,7 +15,6 @@ const Login = () => {
   const onSubmit = async (data) => {
     console.log("Datos de inicio de sesión enviados:", data);
 
-    // Usamos la acción login del flux:
     const success = await actions.login(data.email, data.password);
     if (success) {
       console.log("Inicio de sesión exitoso");

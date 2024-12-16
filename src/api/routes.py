@@ -220,7 +220,7 @@ def get_instructors_by_vehicle():
         return jsonify({"error": str(e)}), 500
 
 
-@api.route('/api/reservations', methods=['POST'])
+@api.route('/reservations', methods=['POST'])
 def create_lesson():
     try:
         data = request.json
