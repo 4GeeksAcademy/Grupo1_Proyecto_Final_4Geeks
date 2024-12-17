@@ -1,16 +1,18 @@
 """This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, url_for, Blueprint, g
 from api.models import db, User, Vehicle, Schedule, Lesson
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from datetime import timedelta, datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies
+from functools import wraps
+import jwt
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
-CORS(api, resources={r"/api/*": {"origins": "*"}})
+CORS(api, resources={r"/api/*": {"origins": "http://127.0.0.1:5500"}})
 
 
 
@@ -41,6 +43,9 @@ def login():
             return jsonify({"message": "El usuario está inactivo"}), 403
 
         access_token = create_access_token(identity=user.user_id)
+
+
+        g.current_user = {'user_id': user.user_id, 'role': user.role}
 
         response = jsonify({
             "message": "Inicio de sesión exitoso",
@@ -171,7 +176,7 @@ def get_instructors_by_vehicle():
         return jsonify({"error": str(e)}), 500
 
 
-@api.route('/api/reservations', methods=['POST'])
+@api.route('/reservations', methods=['POST'])
 def create_lesson():
     try:
         data = request.json
@@ -208,6 +213,8 @@ def create_lesson():
             status=status
         )
 
+        schedule.is_available = False
+
         db.session.add(new_lesson)
         db.session.commit()
 
@@ -216,6 +223,70 @@ def create_lesson():
     except Exception as e:
         print("Error al crear la lección:", e)
         return jsonify({"error": "Error interno del servidor"}), 500
+
+
+
+
+def token_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        token = request.cookies.get('jwt')  
+        if not token:
+            return jsonify({'message': 'Token inválido'}), 401
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            g.current_user = data
+        except:
+            return jsonify({'message': 'Token inválido'}), 401
+        return f(*args, **kwargs)
+    return decorator
+
+
+
+@api.route('/api/user/info', methods=['GET'])
+@token_required
+def get_user_info():
+    user_id = request.args.get('user_id')
+    
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'message': 'Usuario no encontrado'}), 404
+    
+    response_data = user.serialize()
+
+    try:
+
+        if g.current_user['role'] == 'instructor':
+
+            students = User.query.join(Lesson, User.user_id == Lesson.student_id).filter(Lesson.instructor_id == user_id).all()
+            student_data = []
+            for student in students:
+                student_info = student.serialize()
+                lessons = Lesson.query.filter(Lesson.student_id == student.user_id).all()
+                student_info['lessons'] = [lesson.serialize() for lesson in lessons]
+                student_data.append(student_info)
+            response_data['students'] = student_data
+
+        elif g.current_user['role'] == 'student':
+
+            instructor = User.query.join(Lesson, User.user_id == Lesson.instructor_id).filter(Lesson.student_id == user_id).first()
+            if instructor:
+                instructor_info = instructor.serialize()
+                lessons = Lesson.query.filter(Lesson.instructor_id == instructor.user_id).all()
+                instructor_info['lessons'] = [lesson.serialize() for lesson in lessons]
+                response_data['instructor'] = instructor_info
+            else:
+                response_data['instructor'] = None
+
+    except Exception as e:
+
+        return jsonify({'message': 'Error al recuperar la información: ' + str(e)}), 500
+
+    return jsonify(response_data)
+
+
+
 
 
 ## Agendas Disponibles
