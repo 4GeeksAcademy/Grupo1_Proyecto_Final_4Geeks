@@ -5,7 +5,7 @@ import "../../styles/user.css";
 import { Context } from "../store/appContext";
 export const User = () => {
     const { store } = useContext(Context);
-
+    const id = store.user?.user_id
     const [formData, setFormData] = useState({
         fname: store.user?.first_name,
         lname: store.user?.last_name,
@@ -15,7 +15,7 @@ export const User = () => {
         pass: "",
     });
     const [esEditable, setEsEditable] = useState(false);
-    const apiUrl = "https://humble-orbit-g4xjw5p7qvw29p75-3000.app.github.dev/user";
+    const apiUrl = `${process.env.BACKEND_URL}/user`;
 
     const getData = () => {
         fetch(apiUrl + '/user/' + id)
@@ -78,18 +78,22 @@ export const User = () => {
     return (
         <div className="container-fluid">
 
-            <div className="userContainer p-3 my-md-4 border border-primary border-3 rounded">
+            <div className="userContainer p-3 my-md-4 border mt-2 h-100 border-3 rounded">
                 <h1 className="text-center">Ficha de usuario</h1>
 
                 <div className="row m-3">
                     <div className="col-12 col-md-6 text-center text-md-start my-3">
                         <img src={userImg} className="img-thumbnail round border border-primary" alt="Imagen de usuario" />
                     </div>
-                    <div className="col-12 col-md-6 text-center align-self-end my-md-3">
-                        <button type="button" className="btn btn-secondary shadow-sm">Editar imagen</button>
-                    </div>
+                    {esEditable && (
+                        <div className="col-12 col-md-6 text-center align-self-end my-md-3">
+                            <button type="button" className="btn btn-secondary shadow-sm">
+                                Editar imagen
+                            </button>
+                        </div>
+                    )}
                 </div>
-                <div class="input-group input-group-sm mb-3">
+                <div className="input-group input-group-sm mb-3">
                     <span className="input-group-text" id="inputGroup-sizing-sm" value="Leti">Nombre:</span>
                     <input type="text" className="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"
                         value={formData.fname}
@@ -98,7 +102,7 @@ export const User = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div class="input-group input-group-sm mb-3">
+                <div className="input-group input-group-sm mb-3">
                     <span className="input-group-text" id="inputGroup-sizing-sm">Apellido:</span>
                     <input type="text" className="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"
                         value={formData.lname}
@@ -107,7 +111,7 @@ export const User = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div class="input-group input-group-sm mb-3">
+                <div className="input-group input-group-sm mb-3">
                     <span className="input-group-text" id="inputGroup-sizing-sm">Fecha de Nacimiento:</span>
                     <input type="text" className="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"
                         value={formData.fnac}
@@ -116,7 +120,7 @@ export const User = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div class="input-group input-group-sm mb-3">
+                <div className="input-group input-group-sm mb-3">
                     <span className="input-group-text" id="inputGroup-sizing-sm">Teléfono:</span>
                     <input type="text" className="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"
                         value={formData.tel}
@@ -125,7 +129,7 @@ export const User = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div class="input-group input-group-sm mb-3">
+                <div className="input-group input-group-sm mb-3">
                     <span className="input-group-text" id="inputGroup-sizing-sm">email:</span>
                     <input type="email" className="form-control" id="exampleFormControlInput1"
                         value={formData.email}
@@ -134,7 +138,7 @@ export const User = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div class="input-group input-group-sm mb-3">
+                <div className="input-group input-group-sm mb-3">
                     <span className="input-group-text" id="inputGroup-sizing-sm">Password:</span>
                     <input type="password" className="form-control" id="exampleInputPassword1"
                         value={formData.pass}
@@ -145,16 +149,26 @@ export const User = () => {
                 </div>
 
                 <div className="row justify-content-evenly my-md-5">
-                    <button id="edit/guardar" type="button" className="btn btn-light col-4 border border-primary shadow-sm"
-                        onClick={disableInput}>
+                    <button
+                        id="edit/guardar"
+                        type="button"
+                        className={`btn col-4 border border-primary shadow-sm ${esEditable ? "btn-guardar-hover" : "btn-light"}`}
+                        onClick={disableInput}
+                    >
                         {esEditable ? "Guardar" : "Editar"}
                     </button>
-                    <button id="cancelar" type="button" className="btn btn-light col-4 border border-primary shadow-sm"
+                    <button
+                        id="cancelar"
+                        type="button"
+                        className="btn btn-light col-4 border border-primary shadow-sm"
                         onClick={() => {
-                            getData()
-                        }}>Cancelar
+                            getData();
+                        }}
+                    >
+                        Cancelar
                     </button>
                 </div>
+
             </div>
             <div className="d-none d-sm-block d-md-block">
                 <img src={rectangle} className="rectangle" />

@@ -18,7 +18,7 @@ export const Home = () => {
 	const { store, actions } = useContext(Context);
 
 	return (
-		<div className="container">
+		<div className="container-fluid">
 			<div className="jumbotron inter w-100">
 				<div className="col-12 col-md-8">
 					<h1>Impulsando con éxito el camino hacia la excelencia en el manejo desde 2014</h1>
@@ -80,6 +80,7 @@ export const Home = () => {
 					<h1 className="text-center">
 						Te ofrecemos un sistema ordenado, sin complicaciones y a tu ritmo.
 					</h1>
+					
 				</div>
 				<div className="col-12 mt-5 d-flex flex-column">
 					<h3 id="textoSecundario" className="text-md-end pt-4 mt-auto">

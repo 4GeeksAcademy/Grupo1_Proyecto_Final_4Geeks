@@ -175,6 +175,8 @@
   padding: 0px;
   background-color: #e0ebfe;
   bottom: 0px;
+ 
+
 }
 
 .footer-izq,
@@ -186,16 +188,37 @@
   text-align: center;
 }
 
-.social-icons i {
-  cursor: pointer;
-  font-size: medium;
-  line-height: 0;
+.social-icons {
+  height: auto;
+  width: auto;
+  color: #153e81;
+
 }
 
+.social-icons i {
+  cursor: pointer;
+  font-size: large;
+  line-height: 0;
+  transition: color 0.3s ease, transform 0.3s ease; 
+}
+
+.social-icons i:hover {
+  color: #007bff; 
+  transform: scale(1.2); 
+}
+
+.social-icons>i{
+  font-size: 2rem;
+  padding-top: 1rem;
+  color: #153e81;
+
+}
 .titulo {
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   font-size: 1.5rem;
   margin-bottom: 5%;
+  color: #153e81;
+
 }
 
 .parrafo {
@@ -203,10 +226,7 @@
  
 }
 
-.social-icons>i{
-  font-size: 1.5rem;
-  padding-top: 1rem;
-}
+
 
 .location,
 .sobre,
@@ -230,4 +250,26 @@
 
 Navlink {
   color: black;
+}
+
+
+.social-icons i {
+  cursor: pointer;
+  font-size: 1.5rem; /* Tamaño de los íconos */
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-icons i:hover {
+  color: #ff7300; /* Cambia el color al pasar el cursor */
+  transform: scale(1.2); /* Aumenta ligeramente el tamaño */
+}
+
+.titulo {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.texto p {
+  margin: 0;
+  line-height: 1.8;
 }

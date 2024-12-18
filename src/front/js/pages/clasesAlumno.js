@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react'; // Importa useContext
 import { useNavigate } from 'react-router-dom';
+import { Context } from '../store/appContext';
 
-
-function ClassList() {
+function ClasesAlumno() {
+    const { store } = useContext(Context);
     const [classesList, setClassesList] = useState([]);
     const navigate = useNavigate();
 
@@ -13,7 +14,7 @@ function ClassList() {
                     `${process.env.BACKEND_URL}/api/lessons/student`,
                     {
                         headers: {
-                            "Student-ID": "99dd07d3-cfe1-49da-beb0-2c92e6a9ef43",
+                            "Student-ID": store.user?.user_id,
                         },
                     }
                 );
@@ -26,7 +27,7 @@ function ClassList() {
         };
 
         fetchClassesList();
-    }, []);
+    }, [store.user]);
 
     const handleCancelLesson = async (lessonId) => {
         try {
@@ -45,7 +46,7 @@ function ClassList() {
             const data = await response.json();
             console.log('Lesson canceled:', data);
 
-            // Actualiza la lista de clases localmente
+
             setClassesList((prevClasses) =>
                 prevClasses.map((cls) =>
                     cls.lesson_id === lessonId ? { ...cls, status: 'Cancelada' } : cls
@@ -57,12 +58,22 @@ function ClassList() {
     };
 
     return (
-        <div className="container mt-5">
-            <h3>Listado de Clases</h3>
+        <div className="container mt-5 vh-100">
+            <h3 fs-4>Listado de Clases</h3><hr></hr>
             {classesList.length === 0 ? (
-                <p>No hay clases disponibles. <a onClick={navigate("/registroDeClase")}>Regístrate aquí</a>.</p>
+                <p className='fs-3'>
+                    No hay clases disponibles.{" "}
+                    <span
+                        className="text-primary fs-3"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate("/registroDeClase")}
+                    >
+                        Reserva aquí
+                    </span>
+                    .
+                </p>
             ) : (
-                <div className="row">
+                <div className="row mb-4">
                     {classesList.map((cls, index) => (
                         <div key={index} className="col-md-4">
                             <div className="card mb-4 shadow-sm">
@@ -96,10 +107,12 @@ function ClassList() {
                             </div>
                         </div>
                     ))}
+                <h5 className='my-5 p-3'>El profesor se pondrá en contacto 1 hora antes para coordinar un punto de encuentro</h5>
                 </div>
             )}
+            
         </div>
     );
 }
 
-export default ClassList;
+export default ClasesAlumno;

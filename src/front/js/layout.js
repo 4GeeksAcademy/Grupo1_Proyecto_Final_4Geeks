@@ -13,14 +13,14 @@ import RegistroDeClase from "./pages/registroDeClase";
 import ClasesAlumno from "./pages/clasesAlumno";
 import ClasesInstructor from "./pages/clasesInstructor";
 import { Navbar } from "./component/navbar";
-import { Footer } from "./component/footer";
-
+import Footer  from "./component/footer";
+import PrivateRoute from "./component/privateRoute";
 
 
 const Layout = () => {
     const basename = process.env.BASENAME || "";
 
-    if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
+    if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
         <div className="d-flex flex-column min-vh-100">
@@ -30,15 +30,12 @@ const Layout = () => {
                     <div className="flex-grow-1">
                         <Routes>
                             <Route element={<Home />} path="/" />
-                            <Route element={<Login />} path="/login" />
                             <Route element={<Register />} path="/register" />
-                            <Route element={<RegistroDeClase />} path="/registroDeClase" />
-                            <Route element={<ClasesAlumno />} path="/clasesAlumno" />
-                            <Route element={<ClasesInstructor />} path="/clasesInstructor" />
-                            <Route element={<Demo />} path="/demo" />
-                            <Route element={<Single />} path="/single/:theid" />
-                            <Route element={<User />} path="/user" />
-                            <Route element={<h1>Not found!</h1>} path="*" />
+                            <Route element={<Login />} path="/login" />
+                            <Route element={<h1>Not found!</h1>} path="*" /><Route element={<PrivateRoute />}><Route element={<RegistroDeClase />} path="/registroDeClase" />
+                                <Route element={<ClasesAlumno />} path="/clasesAlumno" />
+                                <Route element={<ClasesInstructor />} path="/clasesInstructor" /></Route>
+                                <Route element={<User />} path="/user" />
                         </Routes>
                     </div>
                     <Footer />

@@ -81,12 +81,12 @@ function RegistroDeClase() {
             );
             if (!response.ok) throw new Error('Error al realizar la reserva');
             
-            toast.success("Clase registrada con éxito"); // Notificación de éxito
+            toast.success("Clase registrada con éxito");
 
             resetForm();
             navigate("/clasesAlumno")
         } catch (error) {
-            toast.error("Ups, hubo un error :("); // Notificación de error
+            toast.error("Ups, hubo un error :(");
             console.error('Error:', error.message);
            
         }
@@ -105,7 +105,7 @@ function RegistroDeClase() {
     };
 
     return (
-        <div className="container mt-5">
+        <div className="container mt-5 vh-100">
             <Toaster /> 
             <h2>Reserva de Clase</h2>
             <form >
