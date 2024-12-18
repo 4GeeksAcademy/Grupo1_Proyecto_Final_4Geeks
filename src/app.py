@@ -16,6 +16,7 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from dotenv import load_dotenv
 from flask_cors import CORS  
+from flask import Flask
 
 # Cargar las variables del archivo .env
 load_dotenv()
