@@ -7,7 +7,8 @@ from flask_cors import CORS
 from datetime import timedelta, datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies, JWTManager
 import traceback
-from sqlalchemy.orm import joinedload
+from sqlalchemy import func
+
 
 
 api = Blueprint('api', __name__)
@@ -127,7 +128,7 @@ def create_students():
     if not User.validate_email(data['email']):
         return jsonify({"message": "El email no es válido."}), 400
 
-    role = data.get('role', 'student')  # Asignar 'student' como valor predeterminado
+    role = data.get('role', 'student')  
     valid_roles = ['student', 'instructor']
     if role not in valid_roles:
         return jsonify({"message": f"El campo 'role' debe ser uno de {valid_roles}"}), 400
@@ -142,7 +143,7 @@ def create_students():
             last_name=data['last_name'],
             phone_number=data['phone_number'],
             birthdate=data['birthdate'],
-            role=role  # Usar el valor de 'role' (por defecto será 'student')
+            role=role 
         )
         user.set_password(data['password'])
 
@@ -170,6 +171,59 @@ def get_all_users():
         return jsonify(users_serialized), 200
     except Exception as e:
         return jsonify({"MSG": "Error al obtener usuarios", "error": str(e)}), 500
+
+
+
+
+from datetime import datetime
+
+@api.route('/user', methods=['PUT'])
+def update_user():
+    try:
+        user_id_from_header = request.headers.get('User-ID')
+        if not user_id_from_header:
+            return jsonify({"error": "ID de usuario no encontrado en el header"}), 401
+
+        data = request.json
+        print(f"Datos recibidos: {data}")  # Verifica los datos recibidos
+        user = User.query.get(user_id_from_header)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        email = data.get('email', user.email)
+        first_name = data.get('first_name', user.first_name)
+        last_name = data.get('last_name', user.last_name)
+        phone_number = data.get('phone_number', user.phone_number)
+        profile_image_url = data.get('profile_image_url', user.profile_image_url)
+
+
+        birthdate_str = data.get('birthdate', user.birthdate)
+        try:
+            birthdate = datetime.strptime(birthdate_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"error": "Fecha de nacimiento no válida"}), 400
+
+        if email and not User.validate_email(email):
+            return jsonify({"error": "Email no válido"}), 400
+        if birthdate and not User.validate_birthdate(birthdate):
+            return jsonify({"error": "Fecha de nacimiento no válida"}), 400
+
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.phone_number = phone_number
+        user.profile_image_url = profile_image_url
+        user.birthdate = birthdate
+        user.updated_at = func.now()  
+
+        db.session.commit()
+
+        print(f"Usuario actualizado: {user.serialize()}")  
+        return jsonify(user.serialize()), 200
+
+    except Exception as e:
+        print("Error al actualizar el usuario:", e)
+        return jsonify({"error": "Error interno del servidor"}), 500
 
 
 
