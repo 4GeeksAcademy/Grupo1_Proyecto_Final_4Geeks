@@ -284,6 +284,9 @@ def get_student_lessons():
         schedule = Schedule.query.get(lesson.schedule_id)
         instructor = User.query.get(lesson.instructor_id)
 
+        # Obtener el vehículo asociado al instructor de la lección
+        vehicle = Vehicle.query.filter_by(instructor_id=instructor.user_id).first()
+
         lesson_data = {
             "lesson_id": lesson.lesson_id,
             "status": lesson.status,
@@ -297,6 +300,9 @@ def get_student_lessons():
                 "first_name": instructor.first_name if instructor else None,
                 "last_name": instructor.last_name if instructor else None,
                 "phone_number": instructor.phone_number if instructor else None,
+            },
+            "vehicle": {
+                "type": vehicle.vehicle_type if vehicle else None, 
             }
         }
         result.append(lesson_data)
