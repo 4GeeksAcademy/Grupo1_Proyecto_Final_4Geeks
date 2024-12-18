@@ -5,7 +5,7 @@ from api.models import db, User, Vehicle, Schedule, Lesson
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from datetime import timedelta, datetime
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies, JWTManager
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies
 import traceback
 from sqlalchemy import func
 
@@ -175,7 +175,7 @@ def get_all_users():
 
 
 
-from datetime import datetime
+
 
 @api.route('/users', methods=['PUT'])
 def update_user():
@@ -415,8 +415,57 @@ def get_instructor_lessons():
 
 
 
+@api.route('/lesson/cancel', methods=['PUT'])
+def cancel_lesson():
+    try:
+        lesson_id_from_header = request.headers.get('Lesson-ID')
+        if not lesson_id_from_header:
+            return jsonify({"error": "ID de clase no encontrado en el header"}), 401
+
+        data = request.json
+        lesson_id = data.get('lesson_id')
+        if not lesson_id:
+            return jsonify({"error": "ID de clase no proporcionado"}), 400
+
+        lesson = Lesson.query.get(lesson_id)
+        if not lesson or lesson.lesson_id != lesson_id_from_header:
+            return jsonify({"error": "Clase no encontrada o ID de clase no coincide"}), 404
+
+        lesson.status = 'Cancelada'
+        lesson.updated_at = func.now() 
+
+        schedule = Schedule.query.get(lesson.schedule_id)
+
+        schedule.is_available = True
+
+        db.session.commit()
+
+        return jsonify(lesson.serialize()), 200
+
+    except Exception as e:
+        print("Error al cancelar la clase:", e)
+        return jsonify({"error": "Error interno del servidor"}), 500
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 
 
 ## Agendas Disponibles
@@ -436,7 +485,6 @@ def get_available_schedules():
 
 
 
-"""
 
 @api.route('/users/<string:user_id>', methods=['GET'])
 def get_user_by_id(user_id):
