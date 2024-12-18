@@ -5,9 +5,8 @@ import "../../styles/user.css";
 import { Context } from "../store/appContext";
 
 export const User = () => {
-    const { store, actions } = useContext(Context);
+    const { store } = useContext(Context);
     const id = store.user?.user_id;
-
     const [formData, setFormData] = useState({
         fname: store.user?.first_name || "",
         lname: store.user?.last_name || "",
@@ -20,71 +19,34 @@ export const User = () => {
     const [esEditable, setEsEditable] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState("");
 
-    const apiUrl = `${process.env.BACKEND_URL}/users`;
+    const apiUrl = "https://automatic-dollop-gpj4656p5r5c9r9q-3001.app.github.dev/user";
 
     // Actualiza la URL del avatar dinámicamente
     useEffect(() => {
-        const fname = formData.fname.trim();
-        const lname = formData.lname.trim();
+        const fname = formData.fname?.trim();
+        const lname = formData.lname?.trim();
         const name = `${fname}+${lname}`;
         setAvatarUrl(`https://ui-avatars.com/api/?name=${name}&size=128&background=random`);
     }, [formData.fname, formData.lname]);
 
-    // Actualiza los datos del usuario en el backend y en el store
-    const saveData = () => {
-        fetch(apiUrl, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "User-ID": id, 
-            },
-            body: JSON.stringify({
-                first_name: formData.fname,
-                last_name: formData.lname,
-                birthdate: formData.fnac,
-                phone_number: formData.tel,
-                email: formData.email,
-            }),
-        })
-            .then((resp) => {
-                if (!resp.ok) {
-                    throw new Error("Error al guardar los cambios.");
-                }
-                return resp.json();
-            })
-            .then((data) => {
-                if (data) {
-                    // Actualiza el estado global del usuario
-                    actions.setUser({
-                        ...store.user,
-                        first_name: formData.fname,
-                        last_name: formData.lname,
-                        birthdate: formData.fnac,
-                        phone_number: formData.tel,
-                        email: formData.email,
-                    });
-
-                    setEsEditable(false); // Desactiva el modo edición
-                }
-            })
-            .catch((error) => console.error("Error al actualizar usuario:", error));
-    };
-
-    // Obtiene los datos del usuario desde el backend
     const getData = () => {
-        fetch(apiUrl, {
+        fetch(apiUrl, { // Ya no envías el id en la URL
             method: "GET",
             headers: {
-                "User-ID": id, // Incluye el encabezado requerido
+                "Content-Type": "application/json",
+                "User-ID": id, // Enviando el id en el header
             },
         })
-            .then((resp) => {
-                if (!resp.ok) {
-                    throw new Error("Error al obtener los datos del usuario.");
+            .then(resp => {
+                if (resp.status === 404) {
+                    createUser();
                 }
-                return resp.json();
+                if (resp.ok) {
+                    return resp.json();
+                }
+                throw new Error("Error al obtener los datos del usuario");
             })
-            .then((data) => {
+            .then(data => {
                 if (data) {
                     setFormData({
                         fname: data.first_name,
@@ -96,21 +58,55 @@ export const User = () => {
                     });
                 }
             })
-            .catch((error) => console.error("Error al obtener datos:", error));
+            .catch(error => console.error("Error:", error));
+    };
+
+
+    // Actualizar datos del usuario
+    const putData = () => {
+        fetch(apiUrl, { // Ya no envías el id en la URL
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "User-ID": id, // Enviando el id en el header
+            },
+            body: JSON.stringify({
+                first_name: formData.fname,
+                last_name: formData.lname,
+                birthdate: formData.fnac,
+                phone_number: formData.tel,
+                email: formData.email,
+            }),
+        })
+            .then(resp => {
+                if (!resp.ok) throw new Error("Error al actualizar el usuario");
+                return resp.json();
+            })
+            .then(data => {
+                console.log("Usuario actualizado:", data);
+                setEsEditable(false);
+            })
+            .catch(error => console.error("Error en la actualización:", error));
+    };
+
+
+    // Crear usuario (temporalmente solo muestra un mensaje)
+    const createUser = () => {
+        console.log("El usuario no existe. Creando usuario...");
     };
 
     // Maneja los cambios en los campos del formulario
-    function handleInputChange(e) {
+    const handleInputChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
-    }
+    };
 
-    // Alterna el modo de edición
-    function disableInput() {
+    // Alternar el modo de edición
+    const disableInput = () => {
         setEsEditable(!esEditable);
-    }
+    };
 
     return (
         <div className="container-fluid">
@@ -199,7 +195,7 @@ export const User = () => {
                         type="button"
                         className={`btn col-4 border border-primary shadow-sm ${esEditable ? "btn-guardar-hover" : "btn-light"}`}
                         onClick={() => {
-                            if (esEditable) saveData();
+                            if (esEditable) putData();
                             disableInput();
                         }}
                     >
@@ -208,7 +204,7 @@ export const User = () => {
                     <button
                         type="button"
                         className="btn btn-light col-4 border border-primary shadow-sm"
-                        onClick={() => getData()}
+                        onClick={getData}
                     >
                         Cancelar
                     </button>
@@ -216,7 +212,7 @@ export const User = () => {
             </div>
 
             <div className="d-none d-sm-block d-md-block">
-                <img src={rectangle} className="rectangle" />
+                <img src={rectangle} className="rectangle" alt="background" />
             </div>
         </div>
     );
