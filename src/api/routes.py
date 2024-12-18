@@ -7,7 +7,7 @@ from flask_cors import CORS
 from datetime import timedelta, datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies, JWTManager
 import traceback
-
+from sqlalchemy.orm import joinedload
 
 
 api = Blueprint('api', __name__)
@@ -241,11 +241,11 @@ def create_lesson():
         if not student or not instructor or not schedule:
             return jsonify({"error": "IDs no válidos"}), 400
 
-        # Validar estado de la lección
+
         if not Lesson.validate_status(status):
             return jsonify({"error": "Estado de lección no válido"}), 400
 
-        # Validar que el instructor esté asignado al horario
+
         if not Lesson.validate_schedule_instructor(schedule_id, instructor_id):
             return jsonify({"error": "El instructor no está asignado a este horario"}), 400
 
@@ -265,6 +265,50 @@ def create_lesson():
     except Exception as e:
         print("Error al crear la lección:", e)
         return jsonify({"error": "Error interno del servidor"}), 500
+
+
+@api.route('/lessons/student', methods=['GET'])
+def get_student_lessons():
+    student_id = request.headers.get('Student-ID')
+
+    if not student_id:
+        return jsonify({"message": "El id es necesario"}), 400
+
+    lessons = Lesson.query.filter_by(student_id=student_id).all()
+
+    if not lessons:
+        return jsonify({"message": "No hay lecciones"}), 404
+
+    result = []
+    for lesson in lessons:
+        schedule = Schedule.query.get(lesson.schedule_id)
+        instructor = User.query.get(lesson.instructor_id)
+
+        lesson_data = {
+            "lesson_id": lesson.lesson_id,
+            "status": lesson.status,
+            "is_paid": lesson.is_paid,
+            "schedule": {
+                "date": schedule.date.strftime("%Y-%m-%d") if schedule else None,
+                "time_start": schedule.time_start.strftime("%H:%M") if schedule else None,
+                "time_end": schedule.time_end.strftime("%H:%M") if schedule else None,
+            },
+            "instructor": {
+                "first_name": instructor.first_name if instructor else None,
+                "last_name": instructor.last_name if instructor else None,
+                "phone_number": instructor.phone_number if instructor else None,
+            }
+        }
+        result.append(lesson_data)
+
+    return jsonify(result), 200
+
+
+
+
+
+
+
 
 
 ## Agendas Disponibles
