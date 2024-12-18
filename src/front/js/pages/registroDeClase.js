@@ -81,7 +81,7 @@ function RegistroDeClase() {
             );
             if (!response.ok) throw new Error('Error al realizar la reserva');
             
-            toast.success("Clase registrada con éxito");
+            toast.success("Clase registrada con éxito :D");
 
             resetForm();
             navigate("/clasesAlumno")
@@ -120,7 +120,7 @@ function RegistroDeClase() {
                         onChange={handleVehicleChange}
                         required
                     >
-                        <option value="">Seleccione un vehículo</option>
+                        <option value="">Vehículo</option>
                         <option value="Auto">Auto</option>
                         <option value="Moto">Moto</option>
                         <option value="Camion">Camion</option>
@@ -138,7 +138,7 @@ function RegistroDeClase() {
                         onChange={handleInstructorChange}
                         required
                     >
-                        <option value="">Seleccione un instructor</option>
+                        <option value="">Instructor</option>
                         {instructors.map((inst) => (
                             <option key={inst.instructor_id} value={inst.instructor_id}>
                                 {`${inst.first_name} ${inst.last_name}`}
@@ -158,7 +158,7 @@ function RegistroDeClase() {
                         onChange={handleDateChange}
                         required
                     >
-                        <option value="">Seleccione un día</option>
+                        <option value="">Fecha</option>
                         {scheduleDates.map((date, index) => (
                             <option key={index} value={date}>
                                 {date}
@@ -178,7 +178,7 @@ function RegistroDeClase() {
                         onChange={(e) => setSelectedSchedule(e.target.value)}
                         required
                     >
-                        <option value="">Seleccione un horario</option>
+                        <option value="">Horario</option>
                         {schedules.map((s) => (
                             <option key={s.schedule_id} value={s.schedule_id}>
                                 {`${s.time_start} - ${s.time_end}`}
