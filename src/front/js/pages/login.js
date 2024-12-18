@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
-
-const BACKEND_URL = process.env.BACKEND_URL;
+import { NavLink, useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext";
+import toast, { Toaster } from "react-hot-toast";
 
 const Login = () => {
+  const { store, actions } = useContext(Context);
+  const user = store.user
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -13,30 +17,32 @@ const Login = () => {
   const onSubmit = async (data) => {
     console.log("Datos de inicio de sesión enviados:", data);
 
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    const result = await actions.login(data.email, data.password);
 
-      const result = await response.json();
+    if (result.success) {
+      toast.success("Inicio de sesión exitoso");
+      console.log("Inicio de sesión exitoso");
 
-      if (!response.ok) {
-        throw new Error(result.message || "Error en el inicio de sesión");
-      }
-      console.log("Inicio de sesión exitoso:", result);
-    } catch (error) {
-      console.error("Error:", error.message);
+      // Usa el usuario retornado directamente
+      // navigate(result.user?.role === "instructor" ? "/clasesAlumno" : "/clasesinstructor");
+      navigate("/clasesAlumno");
+    } else {
+      toast.error("Ups, error al iniciar sesión. Verifica tus credenciales.");
+      console.error("Error al iniciar sesión");
     }
   };
 
+
+
+
   return (
-    <div className="container">
-      <div className="col-lg-4 border rounded p-4 m-4">
-        <h3>Iniciar sesión</h3>
+    <div className="container d-flex justify-content-center align-items-center vh-100">
+      <Toaster position="top-center" reverseOrder={false} />
+      <div className="col-lg-4 border rounded p-4 shadow">
+        <h3 className="text-center">Iniciar sesión</h3>
+        <p className="text-center">
+          Si no tienes una cuenta, puedes registrarte <NavLink to="/register">aquí!</NavLink>
+        </p>
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* CORREO ELECTRONICO */}
           <div className="mb-3">
@@ -63,6 +69,7 @@ const Login = () => {
               type="password"
               className="form-control"
               id="password"
+              autoComplete="new-password"
               {...register("password", {
                 required: "La contraseña es obligatoria",
               })}
@@ -71,11 +78,12 @@ const Login = () => {
           </div>
 
           <button type="submit" className="btn btn-primary w-100">
-            <NavLink to="/clasesAlumno" className="text-primary">Ingresar</NavLink>
+            Ingresar
           </button>
         </form>
       </div>
     </div>
+
   );
 };
 
