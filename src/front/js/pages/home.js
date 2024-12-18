@@ -26,8 +26,8 @@ export const Home = () => {
 				<div className="col-12 col-md-10 d-flex justify-content-end m-5">
 					<h2>Tu confianza al volante empieza en RoadUp!</h2>
 				</div>
-				<div className="col-12 col-md-11 d-flex justify-content-end ">
-					<button type="button" className="btn btn-light btn-lg text-primary  shadow">
+				<div className="col-12 col-md-11 d-flex justify-content-end">
+					<button type="button" className="btn btn-light btn-lg text-primary shadow">
 						<NavLink to="/register" className="text-primary">Comienza ahora!</NavLink>
 					</button>
 				</div>
@@ -154,7 +154,9 @@ export const Home = () => {
 						<h5 className="card-title cat">Categoría G2</h5>
 						<p className="card-text">Ciclomotores de hasta 50cc. de cilindrada sin cambios.</p>
 						<div className="text-end">
-							<a href="#" className="btn text-light" role="button" data-bs-toggle="button">Más info {`->`}</a>
+							<button id="edit/guardar" type="button" className="btn text-light">
+								<NavLink to="/masInfo" className="btn text-light">Más info {`->`}</NavLink>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -165,7 +167,9 @@ export const Home = () => {
 						<p className="card-text">Vehículos hasta 9 pasajeros, incluido el conductor;
 							camionetas y vehículos con remolque, con un peso máximo total de hasta 4.000 kg.</p>
 						<div className="text-end">
-							<a href="#" className="btn text-light" role="button" data-bs-toggle="button">Más info {`->`}</a>
+							<button id="edit/guardar" type="button" className="btn text-light">
+								<NavLink to="/masInfo" className="btn text-light">Más info {`->`}</NavLink>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -179,7 +183,9 @@ export const Home = () => {
 							remolque que no sobrepase los 1.500 kg.
 						</p>
 						<div className="text-end">
-							<a href="#" className="btn text-light" role="button" data-bs-toggle="button">Más info {`->`}</a>
+							<button id="edit/guardar" type="button" className="btn text-light">
+								<NavLink to="/masInfo" className="btn text-light">Más info {`->`}</NavLink>
+							</button>
 						</div>
 					</div>
 				</div>
