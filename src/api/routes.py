@@ -234,7 +234,6 @@ def create_lesson():
         if not student_id or not instructor_id or not schedule_id or not status:
             return jsonify({"error": "Datos incompletos"}), 400
 
-
         student = User.query.get(student_id)
         instructor = User.query.get(instructor_id)
         schedule = Schedule.query.get(schedule_id)
@@ -242,14 +241,17 @@ def create_lesson():
         if not student or not instructor or not schedule:
             return jsonify({"error": "IDs no válidos"}), 400
 
-
         if not Lesson.validate_status(status):
             return jsonify({"error": "Estado de lección no válido"}), 400
-
 
         if not Lesson.validate_schedule_instructor(schedule_id, instructor_id):
             return jsonify({"error": "El instructor no está asignado a este horario"}), 400
 
+
+        if status == 'Pendiente':
+            schedule.is_available = False
+        else:
+            schedule.is_available = True
 
         new_lesson = Lesson(
             student_id=student_id,
