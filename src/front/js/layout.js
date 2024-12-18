@@ -14,13 +14,13 @@ import ClasesAlumno from "./pages/clasesAlumno";
 import ClasesInstructor from "./pages/clasesInstructor";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
-
+import { MasInfo } from "./pages/masInfo";
 
 
 const Layout = () => {
     const basename = process.env.BASENAME || "";
 
-    if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
+    if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
         <div className="d-flex flex-column min-vh-100">
@@ -38,6 +38,7 @@ const Layout = () => {
                             <Route element={<Demo />} path="/demo" />
                             <Route element={<Single />} path="/single/:theid" />
                             <Route element={<User />} path="/user" />
+                            <Route element={<MasInfo />} path="/masInfo" />
                             <Route element={<h1>Not found!</h1>} path="*" />
                         </Routes>
                     </div>
