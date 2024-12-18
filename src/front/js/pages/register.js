@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../../styles/register.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import toast, { Toaster } from "react-hot-toast"; // Importar toast y Toaster
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -35,6 +36,7 @@ const Register = () => {
       .then((responseData) => {
         console.log("Respuesta del servidor:", responseData);
         setAlert("Usuario creado con éxito!"); // Mostrar alerta de éxito
+        toast.success("Bienvenido!"); // Notificación de éxito
 
         // Redirigir después de 2 segundos
         setTimeout(() => {

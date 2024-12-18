@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 
 function ClassList() {
@@ -27,7 +27,7 @@ function ClassList() {
         <div className="container mt-5">
             <h3>Listado de Clases</h3>
             {classesList.length === 0 ? (
-                <p>No hay clases disponibles. <a onClick={navigate("/registroDeClase")}>Regístrate aquí</a>.</p>
+                <p>No tienes clases agendadas. Regístrate<NavLink to="/registroDeClase">aquí!</NavLink>.</p>
             ) : (
                 <ul className="list-group">
                     {classesList.map((cls, index) => (

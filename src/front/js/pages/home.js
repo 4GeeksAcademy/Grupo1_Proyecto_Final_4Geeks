@@ -18,8 +18,8 @@ export const Home = () => {
 	const { store, actions } = useContext(Context);
 
 	return (
-		<div className="container-fluid">
-			<div className="jumbotron inter">
+		<div className="container">
+			<div className="jumbotron inter w-100">
 				<div className="col-12 col-md-8">
 					<h1>Impulsando con éxito el camino hacia la excelencia en el manejo desde 2014</h1>
 				</div>
@@ -75,16 +75,14 @@ export const Home = () => {
 					</div>
 				</div>
 			</div>
-			<div className="ruta my-3">
-				<div className="col-12 col-md-9">
-					<h3>
-						Te ofrecemos un sistema ordenado, sin complicaciones y
-						compatible con tus otras actividades.<br />
-						La mejor academia de conducir.
-					</h3>
+			<div className="ruta my-4 ">
+				<div className="col-12 col-md-9 ">
+					<h1 className="text-center">
+						Te ofrecemos un sistema ordenado, sin complicaciones y a tu ritmo.
+					</h1>
 				</div>
-				<div className="col-12 mt-5">
-					<h3>
+				<div className="col-12 mt-5 d-flex flex-column">
+					<h3 id="textoSecundario" className="text-md-end pt-4 mt-auto">
 						Anímate a manejar, queremos ayudarte!
 					</h3>
 				</div>
@@ -147,7 +145,7 @@ export const Home = () => {
 					</p>
 				</div>
 			</div>
-			<div className="categorias row justify-content-between p-3">
+			<div className="categorias row justify-content-around p-3">
 				<h2 className="mt-3 mb-4">Define que libreta obtener</h2>
 				<div className="card col-12 col-md-3">
 					<img src={motoURL} className="card-img-top" alt="moto" />

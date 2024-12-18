@@ -72,6 +72,9 @@
   position: relative;
 }
 
+
+
+
 .pasos {
   background-color: #e0ebfe;
   padding: 1rem;
@@ -141,7 +144,7 @@
 }
 
 .navbar-toggler:hover {
-  color: inherit;
+  color: black;
   box-shadow: inherit;
   background-color: inherit;
 }
@@ -151,7 +154,7 @@
 }
 
 .navbar-toggler {
-  color: #153e81;
+  color: #000000;
 }
 
 .offcanvas-header {
@@ -159,7 +162,7 @@
 }
 
 .nav-link {
-  color: #153e81;
+  color: #000000;
 }
 
 .nav-item:hover{
@@ -197,7 +200,12 @@
 
 .parrafo {
   font-size: medium;
-  line-height: 0;
+ 
+}
+
+.social-icons>i{
+  font-size: 1.5rem;
+  padding-top: 1rem;
 }
 
 .location,

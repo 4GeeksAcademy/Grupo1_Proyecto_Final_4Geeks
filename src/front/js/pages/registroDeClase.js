@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from "react-hot-toast";
 
 
 function RegistroDeClase() {
@@ -79,12 +80,15 @@ function RegistroDeClase() {
                 }
             );
             if (!response.ok) throw new Error('Error al realizar la reserva');
-            alert('Reserva realizada exitosamente');
+            
+            toast.success("Clase registrada con éxito"); // Notificación de éxito
+
             resetForm();
             navigate("/clasesAlumno")
         } catch (error) {
+            toast.error("Ups, hubo un error :("); // Notificación de error
             console.error('Error:', error.message);
-            alert('Error al realizar la reserva');
+           
         }
     };
 
@@ -102,6 +106,7 @@ function RegistroDeClase() {
 
     return (
         <div className="container mt-5">
+            <Toaster /> 
             <h2>Reserva de Clase</h2>
             <form >
                 <div className="mb-3">

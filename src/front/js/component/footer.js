@@ -10,13 +10,13 @@ export const Footer = () => (
 					RoadUp Academia de manejo
 				</div>
 
-				<div className="parrafo">
-					<p>Impulsando tu camino hacia la excelencia en el manejo.</p>
-					<p>Aprende, practica y avanza con confianza.</p>
+				<div className="parrafo p-3">
+					<p>Impulsando tu camino hacia la excelencia en el manejo.
+					Aprende, practica y avanza con confianza.</p>
 				</div>
 
 				<div className="location p-1">
-					<i className="fa-solid fa-location-dot"></i> Francia 24
+					<i className="fa-solid fa-location-dot"></i> Francia 242
 				</div>
 
 				<div className="sobre p-1">
