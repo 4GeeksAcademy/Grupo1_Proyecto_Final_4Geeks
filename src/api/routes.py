@@ -229,6 +229,7 @@ def create_lesson():
         instructor_id = data.get('instructor_id')
         schedule_id = data.get('schedule_id')
         status = data.get('status')
+        is_paid = data.get('is_paid')
 
         if not student_id or not instructor_id or not schedule_id or not status:
             return jsonify({"error": "Datos incompletos"}), 400
@@ -254,7 +255,8 @@ def create_lesson():
             student_id=student_id,
             instructor_id=instructor_id,
             schedule_id=schedule_id,
-            status=status
+            status=status,
+            is_paid=is_paid
         )
 
         db.session.add(new_lesson)
