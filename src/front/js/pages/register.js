@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../../styles/register.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import toast, { Toaster } from "react-hot-toast"; // Importar toast y Toaster
+import toast, { Toaster } from "react-hot-toast";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -46,14 +46,16 @@ const Register = () => {
       .catch((error) => {
         console.error("Error al enviar datos:", error);
         setAlert("Error al registrar el usuario. Intenta de nuevo.");
+        toast.error("Error al crear usuario. Verifica tus datos.");
       });
   });
 
   return (
-    <div className="container">
-      <div className="col-lg-4 border rounded p-4 m-4">
-        <h3>Registro</h3>
-        <p>
+    <div className="container d-flex justify-content-center align-items-center my-5">
+      <Toaster position="top-center" reverseOrder={false} />
+      <div className="col-lg-4 border rounded p-4 shadow">
+        <h3 className="text-center">Registro</h3>
+        <p className="text-center">
           Si ya tienes una cuenta, inicia sesión{" "}
           <NavLink to="/login" className="text-primary">
             aquí!
@@ -200,7 +202,7 @@ const Register = () => {
 
           {/* BOTÓN DE REGISTRO */}
           <button type="submit" className="btn btn-primary w-100 mt-3">
-            Registrarse
+            Regístrate
           </button>
         </form>
       </div>

@@ -5,8 +5,9 @@ from api.models import db, User, Vehicle, Schedule, Lesson
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from datetime import timedelta, datetime
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies, JWTManager
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies
 import traceback
+from sqlalchemy import func
 
 
 
@@ -127,7 +128,7 @@ def create_students():
     if not User.validate_email(data['email']):
         return jsonify({"message": "El email no es válido."}), 400
 
-    role = data.get('role', 'student')  # Asignar 'student' como valor predeterminado
+    role = data.get('role', 'student')  
     valid_roles = ['student', 'instructor']
     if role not in valid_roles:
         return jsonify({"message": f"El campo 'role' debe ser uno de {valid_roles}"}), 400
@@ -142,7 +143,7 @@ def create_students():
             last_name=data['last_name'],
             phone_number=data['phone_number'],
             birthdate=data['birthdate'],
-            role=role  # Usar el valor de 'role' (por defecto será 'student')
+            role=role 
         )
         user.set_password(data['password'])
 
@@ -170,6 +171,59 @@ def get_all_users():
         return jsonify(users_serialized), 200
     except Exception as e:
         return jsonify({"MSG": "Error al obtener usuarios", "error": str(e)}), 500
+
+
+
+
+
+
+@api.route('/users', methods=['PUT'])
+def update_user():
+    try:
+        user_id_from_header = request.headers.get('User-ID')
+        if not user_id_from_header:
+            return jsonify({"error": "ID de usuario no encontrado en el header"}), 401
+
+        data = request.json
+        print(f"Datos recibidos: {data}")  
+        user = User.query.get(user_id_from_header)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        email = data.get('email', user.email)
+        first_name = data.get('first_name', user.first_name)
+        last_name = data.get('last_name', user.last_name)
+        phone_number = data.get('phone_number', user.phone_number)
+        profile_image_url = data.get('profile_image_url', user.profile_image_url)
+
+
+        birthdate_str = data.get('birthdate', user.birthdate)
+        try:
+            birthdate = datetime.strptime(birthdate_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"error": "Fecha de nacimiento no válida"}), 400
+
+        if email and not User.validate_email(email):
+            return jsonify({"error": "Email no válido"}), 400
+        if birthdate and not User.validate_birthdate(birthdate):
+            return jsonify({"error": "Fecha de nacimiento no válida"}), 400
+
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.phone_number = phone_number
+        user.profile_image_url = profile_image_url
+        user.birthdate = birthdate
+        user.updated_at = func.now()  
+
+        db.session.commit()
+
+        print(f"Usuario actualizado: {user.serialize()}")  
+        return jsonify(user.serialize()), 200
+
+    except Exception as e:
+        print("Error al actualizar el usuario:", e)
+        return jsonify({"error": "Error interno del servidor"}), 500
 
 
 
@@ -229,10 +283,10 @@ def create_lesson():
         instructor_id = data.get('instructor_id')
         schedule_id = data.get('schedule_id')
         status = data.get('status')
+        is_paid = data.get('is_paid')
 
         if not student_id or not instructor_id or not schedule_id or not status:
             return jsonify({"error": "Datos incompletos"}), 400
-
 
         student = User.query.get(student_id)
         instructor = User.query.get(instructor_id)
@@ -241,20 +295,24 @@ def create_lesson():
         if not student or not instructor or not schedule:
             return jsonify({"error": "IDs no válidos"}), 400
 
-        # Validar estado de la lección
         if not Lesson.validate_status(status):
             return jsonify({"error": "Estado de lección no válido"}), 400
 
-        # Validar que el instructor esté asignado al horario
         if not Lesson.validate_schedule_instructor(schedule_id, instructor_id):
             return jsonify({"error": "El instructor no está asignado a este horario"}), 400
 
+
+        if status == 'Pendiente':
+            schedule.is_available = False
+        else:
+            schedule.is_available = True
 
         new_lesson = Lesson(
             student_id=student_id,
             instructor_id=instructor_id,
             schedule_id=schedule_id,
-            status=status
+            status=status,
+            is_paid=is_paid
         )
 
         db.session.add(new_lesson)
@@ -265,6 +323,141 @@ def create_lesson():
     except Exception as e:
         print("Error al crear la lección:", e)
         return jsonify({"error": "Error interno del servidor"}), 500
+
+
+@api.route('/lessons/student', methods=['GET'])
+def get_student_lessons():
+    student_id = request.headers.get('Student-ID')
+
+    if not student_id:
+        return jsonify({"message": "El id es necesario"}), 400
+
+    lessons = Lesson.query.filter_by(student_id=student_id).all()
+
+    if not lessons:
+        return jsonify({"message": "No hay lecciones"}), 404
+
+    result = []
+    for lesson in lessons:
+        schedule = Schedule.query.get(lesson.schedule_id)
+        instructor = User.query.get(lesson.instructor_id)
+        vehicle = Vehicle.query.filter_by(instructor_id=instructor.user_id).first()
+
+        lesson_data = {
+            "lesson_id": lesson.lesson_id,
+            "status": lesson.status,
+            "is_paid": lesson.is_paid,
+            "date": schedule.date.strftime("%Y-%m-%d") if schedule else None,
+            "time_start": schedule.time_start.strftime("%H:%M") if schedule else None,
+            "time_end": schedule.time_end.strftime("%H:%M") if schedule else None,
+            "instructor_first_name": instructor.first_name if instructor else None,
+            "instructor_last_name": instructor.last_name if instructor else None,
+            "instructor_phone": instructor.phone_number if instructor else None,
+            "vehicle_type": vehicle.vehicle_type if vehicle else None,
+        }
+        result.append(lesson_data)
+
+    return jsonify(result), 200
+
+
+
+
+@api.route('/lessons/instructor', methods=['GET'])
+def get_instructor_lessons():
+    instructor_id = request.headers.get('Instructor-ID')
+
+    if not instructor_id:
+        return jsonify({"message": "El id del instructor es necesario"}), 400
+
+    lessons = Lesson.query.filter_by(instructor_id=instructor_id).all()
+
+    if not lessons:
+        return jsonify({"message": "No hay lecciones"}), 404
+
+    result = []
+    for lesson in lessons:
+        schedule = Schedule.query.get(lesson.schedule_id)
+        student = User.query.get(lesson.student_id)
+
+        # Obtener el vehículo asociado al instructor de la lección
+        vehicle = Vehicle.query.filter_by(instructor_id=instructor_id).first()
+
+        lesson_data = {
+            "lesson_id": lesson.lesson_id,
+            "status": lesson.status,
+            "is_paid": lesson.is_paid,
+            "schedule": {
+                "date": schedule.date.strftime("%Y-%m-%d") if schedule else None,
+                "time_start": schedule.time_start.strftime("%H:%M") if schedule else None,
+                "time_end": schedule.time_end.strftime("%H:%M") if schedule else None,
+            },
+            "student": {
+                "first_name": student.first_name if student else None,
+                "last_name": student.last_name if student else None,
+                "phone_number": student.phone_number if student else None,
+                "profile_image_url": student.profile_image_url if student else None,
+            },
+            "vehicle": {
+                "type": vehicle.vehicle_type if vehicle else None,  
+            }
+        }
+        result.append(lesson_data)
+
+    return jsonify(result), 200
+
+
+
+@api.route('/lesson/cancel', methods=['PUT'])
+def cancel_lesson():
+    try:
+        lesson_id_from_header = request.headers.get('Lesson-ID')
+        if not lesson_id_from_header:
+            return jsonify({"error": "ID de clase no encontrado en el header"}), 401
+
+        data = request.json
+        lesson_id = data.get('lesson_id')
+        if not lesson_id:
+            return jsonify({"error": "ID de clase no proporcionado"}), 400
+
+        lesson = Lesson.query.get(lesson_id)
+        if not lesson or lesson.lesson_id != lesson_id_from_header:
+            return jsonify({"error": "Clase no encontrada o ID de clase no coincide"}), 404
+
+        lesson.status = 'Cancelada'
+        lesson.updated_at = func.now() 
+
+        schedule = Schedule.query.get(lesson.schedule_id)
+
+        schedule.is_available = True
+
+        db.session.commit()
+
+        return jsonify(lesson.serialize()), 200
+
+    except Exception as e:
+        print("Error al cancelar la clase:", e)
+        return jsonify({"error": "Error interno del servidor"}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 
 
 ## Agendas Disponibles
@@ -284,7 +477,6 @@ def get_available_schedules():
 
 
 
-"""
 
 @api.route('/users/<string:user_id>', methods=['GET'])
 def get_user_by_id(user_id):

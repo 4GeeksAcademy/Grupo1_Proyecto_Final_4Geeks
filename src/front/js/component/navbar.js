@@ -8,8 +8,8 @@ export const Navbar = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        actions.logout(); 
-        navigate("/");    
+        actions.logout();
+        navigate("/");
     };
 
     return (
@@ -63,11 +63,9 @@ export const Navbar = () => {
                     <div className="offcanvas-body">
                         <ul className="navbar-nav justify-content-end flex-grow-1 pe-3 w-100">
                             <li className="nav-item">
-								<NavLink to="/clasesAlumno" className="nav-link">Mis clases</NavLink>
+                                <NavLink to={user?.user_role == "instructor" ? "/clasesAlumno" : "/clasesinstructor"} className="nav-link">Mis clases</NavLink>
                             </li>
-                            <li className="nav-item">
-							<NavLink to="/registroDeClase" className="nav-link">Agendar clase</NavLink>
-                            </li>
+
                             <li className="nav-item">
                                 <NavLink to="/user" className="nav-link">Mi usuario</NavLink>
                             </li>

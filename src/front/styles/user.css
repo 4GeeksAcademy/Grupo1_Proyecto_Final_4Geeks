@@ -13,8 +13,11 @@
     }
 }
 
+
+
+
 .userContainer{
-    background-color: #E0EBFE;
+    background-color: #f9f9fa;
     margin: 0 auto;
 }
 
@@ -39,3 +42,16 @@
   .rectangle{
     width: 100%;
 }
+
+/* Estilo del botón cuando es "Guardar" */
+.btn-guardar-hover {
+    background-color: #ffffff; /* Color verde */
+    color: rgb(0, 0, 0); /* Texto blanco */
+    transition: background-color 0.3s ease; /* Animación suave */
+  }
+  
+  /* Hover */
+  .btn-guardar-hover:hover {
+    background-color: #b2fac2; /* Verde más oscuro en hover */
+  }
+  

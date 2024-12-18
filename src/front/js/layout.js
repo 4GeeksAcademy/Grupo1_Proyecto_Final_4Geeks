@@ -13,8 +13,11 @@ import RegistroDeClase from "./pages/registroDeClase";
 import ClasesAlumno from "./pages/clasesAlumno";
 import ClasesInstructor from "./pages/clasesInstructor";
 import { Navbar } from "./component/navbar";
+
 import { Footer } from "./component/footer";
 import { MasInfo } from "./pages/masInfo";
+import PrivateRoute from "./component/privateRoute";
+
 
 
 const Layout = () => {
@@ -30,16 +33,17 @@ const Layout = () => {
                     <div className="flex-grow-1">
                         <Routes>
                             <Route element={<Home />} path="/" />
-                            <Route element={<Login />} path="/login" />
                             <Route element={<Register />} path="/register" />
+
+                            <Route element={<Login />} path="/login" />
+                            <Route element={<h1>Not found!</h1>} path="*" />
+                            <Route element={<PrivateRoute />}>
                             <Route element={<RegistroDeClase />} path="/registroDeClase" />
                             <Route element={<ClasesAlumno />} path="/clasesAlumno" />
                             <Route element={<ClasesInstructor />} path="/clasesInstructor" />
-                            <Route element={<Demo />} path="/demo" />
-                            <Route element={<Single />} path="/single/:theid" />
                             <Route element={<User />} path="/user" />
                             <Route element={<MasInfo />} path="/masInfo" />
-                            <Route element={<h1>Not found!</h1>} path="*" />
+
                         </Routes>
                     </div>
                     <Footer />

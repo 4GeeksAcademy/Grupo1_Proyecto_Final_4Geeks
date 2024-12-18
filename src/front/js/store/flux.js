@@ -2,7 +2,7 @@ const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
             message: null,
-            user: null, // Aquí guardaremos el usuario logueado
+            user: null,
             demo: [
                 {
                     title: "FIRST",
@@ -34,10 +34,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                     // Guardar el user en el store
                     setStore({ user: data.user });
 
-                    return true;
+                    return { success: true, user: data.user }; // Retorna éxito y el usuario
                 } catch (error) {
                     console.error("Error en login:", error);
-                    return false;
+                    return { success: false, user: null }; // Retorna fallo y usuario null
                 }
             },
 
