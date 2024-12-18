@@ -284,7 +284,7 @@ def get_student_lessons():
         schedule = Schedule.query.get(lesson.schedule_id)
         instructor = User.query.get(lesson.instructor_id)
 
-        # Obtener el vehículo asociado al instructor de la lección
+
         vehicle = Vehicle.query.filter_by(instructor_id=instructor.user_id).first()
 
         lesson_data = {
@@ -310,6 +310,50 @@ def get_student_lessons():
     return jsonify(result), 200
 
 
+
+
+@api.route('/lessons/instructor', methods=['GET'])
+def get_instructor_lessons():
+    instructor_id = request.headers.get('Instructor-ID')
+
+    if not instructor_id:
+        return jsonify({"message": "El id del instructor es necesario"}), 400
+
+    lessons = Lesson.query.filter_by(instructor_id=instructor_id).all()
+
+    if not lessons:
+        return jsonify({"message": "No hay lecciones"}), 404
+
+    result = []
+    for lesson in lessons:
+        schedule = Schedule.query.get(lesson.schedule_id)
+        student = User.query.get(lesson.student_id)
+
+        # Obtener el vehículo asociado al instructor de la lección
+        vehicle = Vehicle.query.filter_by(instructor_id=instructor_id).first()
+
+        lesson_data = {
+            "lesson_id": lesson.lesson_id,
+            "status": lesson.status,
+            "is_paid": lesson.is_paid,
+            "schedule": {
+                "date": schedule.date.strftime("%Y-%m-%d") if schedule else None,
+                "time_start": schedule.time_start.strftime("%H:%M") if schedule else None,
+                "time_end": schedule.time_end.strftime("%H:%M") if schedule else None,
+            },
+            "student": {
+                "first_name": student.first_name if student else None,
+                "last_name": student.last_name if student else None,
+                "phone_number": student.phone_number if student else None,
+                "profile_image_url": student.profile_image_url if student else None,
+            },
+            "vehicle": {
+                "type": vehicle.vehicle_type if vehicle else None,  
+            }
+        }
+        result.append(lesson_data)
+
+    return jsonify(result), 200
 
 
 
