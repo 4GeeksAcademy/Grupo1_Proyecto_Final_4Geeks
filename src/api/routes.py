@@ -1,29 +1,29 @@
-"""This module takes care of starting the API Server, Loading the DB and Adding the endpoints"""
-from flask import Flask, request, jsonify, Blueprint
+"""This module takes care of starting the API Server, Loading the DB and Adding the endpoints
+"""
+from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, Vehicle, Schedule, Lesson
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from datetime import datetime
+from datetime import timedelta, datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies
 import traceback
 from sqlalchemy import func
 
+
+
 api = Blueprint('api', __name__)
 
-# Configura CORS para el Blueprint
-CORS(api, supports_credentials=True, resources={r"/*": {"origins": "https://opulent-carnival-w4prx9x4gr7269q-3000.app.github.dev"}})
+# Allow CORS requests to this API
+CORS(api, resources={r"/api/*": {"origins": "*"}})
 
-VALID_ROLES = ['student', 'instructor']  # Roles permitidos
-
-# Endpoint de prueba
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
     response_body = {
-        "message": "Hello! I'm a message from the backend."
+        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
     }
     return jsonify(response_body), 200
 
-### Autenticación
+### Login Endpoints
 
 @api.route('/login', methods=['POST'])
 def login():
@@ -51,11 +51,27 @@ def login():
         })
 
         set_access_cookies(response, access_token)
+
         return response, 200
 
     except Exception as e:
         print(f"Error en el login: {str(e)}")
         return jsonify({"message": "Error interno del servidor"}), 500
+
+
+@api.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if user:
+        return jsonify({
+            "message": "Acceso permitido",
+        }), 200
+    else:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+        
 
 @api.route('/logout', methods=['POST'])
 def logout():
@@ -63,6 +79,44 @@ def logout():
     unset_jwt_cookies(response)
     return response, 200
 
+
+# ### Crear Usuarios
+# @api.route("/create_user", methods=["POST"])
+# def create_students():
+#     data = request.get_json()
+
+#     if not data or not all(key in data for key in ('email', 'password', 'first_name', 'last_name', 'phone_number')):
+#         return jsonify({"message": "Faltan datos requeridos."}), 400
+
+#     if not User.validate_email(data['email']):
+#         return jsonify({"message": "El email no es válido."}), 400
+
+#     try:
+#         user_id = data.get('user_id', None)
+#         user = User(
+#             user_id=user_id,
+#             email=data['email'],
+#             password=data['password'],
+#             first_name=data['first_name'],
+#             last_name=data['last_name'],
+#             phone_number=data['phone_number'],
+#             birthdate=data['birthdate'],
+#         )
+#         user.set_password(data['password'])
+
+#         db.session.add(user)
+#         db.session.commit()
+
+#         return jsonify({"message": f"Usuario {data['email']} creado exitosamente."}), 201
+
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({"message": "Hubo un error al crear el usuario.", "error": str(e)}), 500
+
+
+
+
+# Codigo con el rol por defecto en student 
 ### Crear Usuarios
 @api.route("/create_user", methods=["POST"])
 def create_students():
@@ -74,18 +128,22 @@ def create_students():
     if not User.validate_email(data['email']):
         return jsonify({"message": "El email no es válido."}), 400
 
-    role = data.get('role', 'student')  # Rol por defecto
-    if role not in VALID_ROLES:
-        return jsonify({"message": f"El campo 'role' debe ser uno de {VALID_ROLES}"}), 400
+    role = data.get('role', 'student')  
+    valid_roles = ['student', 'instructor']
+    if role not in valid_roles:
+        return jsonify({"message": f"El campo 'role' debe ser uno de {valid_roles}"}), 400
 
     try:
+        user_id = data.get('user_id', None)
         user = User(
+            user_id=user_id,
             email=data['email'],
+            password=data['password'],
             first_name=data['first_name'],
             last_name=data['last_name'],
             phone_number=data['phone_number'],
-            birthdate=data.get('birthdate'),
-            role=role
+            birthdate=data['birthdate'],
+            role=role 
         )
         user.set_password(data['password'])
 
@@ -96,55 +154,79 @@ def create_students():
 
     except Exception as e:
         db.session.rollback()
-        print(traceback.format_exc())
-        return jsonify({"message": "Error interno del servidor."}), 500
+        print("Error al crear el usuario:")
+        print(traceback.format_exc())  # Imprime el error completo en la terminal
+        return jsonify({
+        "message": "Hubo un error al crear el usuario.",
+        "error": str(e)  # Dejar el error también en la respuesta
+    }), 500
+
 
 ### Obtener Usuarios
 @api.route('/users', methods=['GET'])
-@jwt_required()
 def get_all_users():
     try:
         users = User.query.all()
-        return jsonify([user.serialize() for user in users]), 200
+        users_serialized = [user.serialize() for user in users]
+        return jsonify(users_serialized), 200
     except Exception as e:
-        print(traceback.format_exc())
-        return jsonify({"message": "Error interno del servidor."}), 500
+        return jsonify({"MSG": "Error al obtener usuarios", "error": str(e)}), 500
 
-@api.route('/users/<string:user_id>', methods=['GET'])
-@jwt_required()
-def get_user_by_id(user_id):
-    try:
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({"error": "Usuario no encontrado."}), 404
-        return jsonify(user.serialize()), 200
-    except Exception as e:
-        print(traceback.format_exc())
-        return jsonify({"message": "Error interno del servidor."}), 500
 
-### Actualizar Usuario
+
+
+
+
 @api.route('/users', methods=['PUT'])
-@jwt_required()
-def update_user(user_id):
+def update_user():
     try:
+        user_id_from_header = request.headers.get('User-ID')
+        if not user_id_from_header:
+            return jsonify({"error": "ID de usuario no encontrado en el header"}), 401
+
         data = request.json
-
-        user = User.query.get(user_id)
+        print(f"Datos recibidos: {data}")  
+        user = User.query.get(user_id_from_header)
         if not user:
-            return jsonify({"error": "Usuario no encontrado."}), 404
+            return jsonify({"error": "Usuario no encontrado"}), 404
 
-        user.email = data.get('email', user.email)
-        user.first_name = data.get('first_name', user.first_name)
-        user.last_name = data.get('last_name', user.last_name)
-        user.phone_number = data.get('phone_number', user.phone_number)
-        user.birthdate = data.get('birthdate', user.birthdate)
+        email = data.get('email', user.email)
+        first_name = data.get('first_name', user.first_name)
+        last_name = data.get('last_name', user.last_name)
+        phone_number = data.get('phone_number', user.phone_number)
+        profile_image_url = data.get('profile_image_url', user.profile_image_url)
+
+
+        birthdate_str = data.get('birthdate', user.birthdate)
+        try:
+            birthdate = datetime.strptime(birthdate_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"error": "Fecha de nacimiento no válida"}), 400
+
+        if email and not User.validate_email(email):
+            return jsonify({"error": "Email no válido"}), 400
+        if birthdate and not User.validate_birthdate(birthdate):
+            return jsonify({"error": "Fecha de nacimiento no válida"}), 400
+
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.phone_number = phone_number
+        user.profile_image_url = profile_image_url
+        user.birthdate = birthdate
+        user.updated_at = func.now()  
 
         db.session.commit()
 
+        print(f"Usuario actualizado: {user.serialize()}")  
         return jsonify(user.serialize()), 200
+
     except Exception as e:
-        print(traceback.format_exc())
-        return jsonify({"message": "Error interno del servidor."}), 500
+        print("Error al actualizar el usuario:", e)
+        return jsonify({"error": "Error interno del servidor"}), 500
+
+
+
 
 @api.route('/lessons/available', methods=['GET'])
 def get_instructors_by_vehicle():
@@ -190,6 +272,7 @@ def get_instructors_by_vehicle():
         return jsonify(instructors_serialized), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @api.route('/reservations', methods=['POST'])
 def create_lesson():
@@ -240,6 +323,7 @@ def create_lesson():
     except Exception as e:
         print("Error al crear la lección:", e)
         return jsonify({"error": "Error interno del servidor"}), 500
+
 
 @api.route('/lessons/student', methods=['GET'])
 def get_student_lessons():
@@ -353,3 +437,5 @@ def cancel_lesson():
     except Exception as e:
         print("Error al cancelar la clase:", e)
         return jsonify({"error": "Error interno del servidor"}), 500
+
+
