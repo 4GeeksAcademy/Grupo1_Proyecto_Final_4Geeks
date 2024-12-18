@@ -177,7 +177,7 @@ def get_all_users():
 
 from datetime import datetime
 
-@api.route('/user', methods=['PUT'])
+@api.route('/users', methods=['PUT'])
 def update_user():
     try:
         user_id_from_header = request.headers.get('User-ID')
@@ -185,7 +185,7 @@ def update_user():
             return jsonify({"error": "ID de usuario no encontrado en el header"}), 401
 
         data = request.json
-        print(f"Datos recibidos: {data}")  # Verifica los datos recibidos
+        print(f"Datos recibidos: {data}")  
         user = User.query.get(user_id_from_header)
         if not user:
             return jsonify({"error": "Usuario no encontrado"}), 404
